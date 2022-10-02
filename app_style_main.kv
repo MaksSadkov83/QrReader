@@ -11,20 +11,21 @@ MDScreen:
         MDScreenManager:
 
             MDScreen:
-
-                MDTopAppBar:
-                    title: "QR Reader"
-                    elevation: 4
-                    pos_hint: {"top": 1}
-                    md_bg_color: "#3c8bff"
-                    specific_text_color: "#FFFFFF"
-                    left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
-
-                MDWidget:
-                    size_hint: 1, .9
-                    height: self.width
+                MDBoxLayout:
                     md_bg_color: "#FFFFFF"
+                    orientation: "vertical"
 
+                    MDTopAppBar:
+                        title: "QR Reader"
+                        elevation: 4
+                        pos_hint: {"top": 1}
+                        md_bg_color: "#095EB1"
+                        specific_text_color: "#FFFFFF"
+                        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+
+                    MDTabs:
+                        pos_hint: {"top": 2}
+                        id: tabs
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -46,17 +47,17 @@ MDScreen:
                     text: "GitHub"
 
                 DrawerClickableItem:
-                    icon: "account"
-                    text: "О нас"
-
-                DrawerClickableItem:
                     icon: "brush"
                     text: "Поменять стиль"
 
                 DrawerClickableItem:
-                    icon: "chat-question"
-                    text: "Справка"
-
-                DrawerClickableItem:
                     icon: "cash"
                     text: "Спонсировать"
+
+                DrawerClickableItem:
+                    icon: "share-variant"
+                    text: "Поделится"
+
+                DrawerClickableItem:
+                    icon: "account-edit"
+                    text: "Написать разработчику"
