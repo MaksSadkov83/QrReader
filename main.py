@@ -1,10 +1,11 @@
+from kivy.lang import Builder
+
 from kivymd.app import MDApp
-from kivymd.uix.label import MDLabel
 
-class QrReaderApp(MDApp):
+class Example(MDApp):
     def build(self):
-        return MDLabel(text="PRIVET MIR !!!", halign="center")
+        self.theme_cls.theme_style = "Dark"
+        return Builder.load_file("app_style_main.kv")
 
-if __name__ == "__main__":
-    QrReaderApp().run()
 
+Example().run()

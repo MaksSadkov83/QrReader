@@ -1,0 +1,62 @@
+<DrawerClickableItem@MDNavigationDrawerItem>
+    focus_color: "#e7e4c0"
+    text_color: "#4a4939"
+    icon_color: "#4a4939"
+    selected_color: "#0c6c4d"
+
+MDScreen:
+
+    MDNavigationLayout:
+
+        MDScreenManager:
+
+            MDScreen:
+
+                MDTopAppBar:
+                    title: "QR Reader"
+                    elevation: 4
+                    pos_hint: {"top": 1}
+                    md_bg_color: "#3c8bff"
+                    specific_text_color: "#FFFFFF"
+                    left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+
+                MDWidget:
+                    size_hint: 1, .9
+                    height: self.width
+                    md_bg_color: "#FFFFFF"
+
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            radius: (0, 16, 16, 0)
+
+            MDNavigationDrawerMenu:
+
+                MDNavigationDrawerHeader:
+                    title: "QR Reader"
+                    text: "NAET V 0.1"
+                    source: "logo.png"
+                    title_color: "#FFFFFF"
+                    text_color: "#4a4939"
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+
+                DrawerClickableItem:
+                    icon: "github"
+                    text: "GitHub"
+
+                DrawerClickableItem:
+                    icon: "account"
+                    text: "О нас"
+
+                DrawerClickableItem:
+                    icon: "brush"
+                    text: "Поменять стиль"
+
+                DrawerClickableItem:
+                    icon: "chat-question"
+                    text: "Справка"
+
+                DrawerClickableItem:
+                    icon: "cash"
+                    text: "Спонсировать"
