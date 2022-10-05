@@ -25,7 +25,48 @@ MDScreen:
 
                     MDTabs:
                         pos_hint: {"top": 2}
+                        suze_hint_y: None
+                        on_tab_switch: app.on_tab_switch(*args)
+                        height: "48dp"
+                        tab_indicator_anim: False
                         id: tabs
+
+                        Tab:
+                            id: tab1
+                            name: 'tab1'
+                            title: "Камера"
+                            icon: "camera"
+
+                            BoxLayout:
+                                orientation: "vertical"
+                                Camera:
+                                    id: camera
+                                    resolution: (640, 480)
+                                    play: False
+                                ToggleButton:
+                                    text: 'Play'
+                                    on_press: camera.play = not camera.play
+                                    size_hint_y: None
+                                    height: '48dp'
+                                Button:
+                                    text: 'Capture'
+                                    size_hint_y: None
+                                    height: '48dp'
+                                    on_press: app.capture()
+                        Tab:
+                            id: tab2
+                            name: 'tab2'
+                            title: "Реузльтат сканирования"
+                            icon: "magnify"
+
+                        Tab:
+                            id: tab3
+                            name: 'tab3'
+                            title: "Справка"
+                            icon: "chat-question"
+
+                            BoxLayout:
+
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -35,7 +76,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "QR Reader"
-                    text: "NAET V 0.4"
+                    text: "NAET V0.4"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
@@ -43,7 +84,7 @@ MDScreen:
 
                 DrawerClickableItem:
                     icon: "github"
-                    text: "GitHub"
+                    text: "Исходный код"
 
                 DrawerClickableItem:
                     icon: "brush"
