@@ -91,6 +91,10 @@ MDScreen:
                                     text:"3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм"
                                     halign: "left"
                                     theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:"Если агоритм не смог обработать фотку введите Инв. № во вкладке 'Результат'"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -109,7 +113,7 @@ MDScreen:
                 DrawerClickableItem:
                     icon: "github"
                     on_press: app.github()
-                    text: "Исходный код"
+                    text: "Исполняемый файл (Android, IoS)"
 
                 DrawerClickableItem:
                     icon: "brush"
@@ -117,11 +121,6 @@ MDScreen:
                     text: "Поменять стиль"
 
                 DrawerClickableItem:
-                    icon: "share-variant"
-                    on_press: app.show_grid_bottom_sheet()
-                    text: "Поделится"
-
-                DrawerClickableItem:
                     icon: "account-edit"
-                    on_press: app.write_to_developer()
+                    on_press: app.show_grid_bottom_sheet()
                     text: "Написать разработчику"

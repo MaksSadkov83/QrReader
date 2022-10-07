@@ -7,7 +7,7 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
 import time
-from kivymd.uix.label import MDLabel
+import webbrowser
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
@@ -27,8 +27,7 @@ class QRReaderApp(MDApp):
         :param instance_tab_label: <kivymd.uix.tab.MDTabsLabel object>;
         :param tab_text: text or name icon of tab;
         '''
-
-        count_icon = instance_tab.icon  # get the tab icon
+        pass
 
 
     def capture(self):
@@ -44,13 +43,28 @@ class QRReaderApp(MDApp):
         pass
 
     def github(self):
-        pass
+        url = "https://github.com/MaksSadkov83/QrReader/releases"
+        webbrowser.open(url, new=0, autoraise=True)
 
     def style_change(self):
         pass
 
     def callback_for_menu_items(self, *args):
+        if args[0] == "Telegram":
+            url = "https://web.telegram.org/k/#1187734754"
+            webbrowser.open(url, new=0, autoraise=True)
+        elif args[0] == "WhatsApp":
+            url = "http://Wa.me/+79110673159"
+            webbrowser.open(url, new=0, autoraise=True)
+        elif args[0] == "VK":
+            url = "https://vk.com/smnxzmn"
+            webbrowser.open(url, new=0, autoraise=True)
         toast(args[0])
+
+    # DrawerClickableItem:
+    # icon: "share-variant"
+    # on_press: app.show_grid_bottom_sheet()
+    # text: "Поделится"
 
     def show_grid_bottom_sheet(self):
         bottom_sheet_menu = MDGridBottomSheet()
@@ -66,9 +80,6 @@ class QRReaderApp(MDApp):
                 icon_src=item[1],
             )
         bottom_sheet_menu.open()
-
-    def write_to_developer(self):
-        pass
 
 if __name__ == "__main__":
     QRReaderApp().run()
