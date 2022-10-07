@@ -36,11 +36,11 @@ MDScreen:
                             name: 'tab1'
                             title: "Камера"
                             icon: "camera"
-
                             BoxLayout:
-                                orientation: "vertical"
+                                orientation: 'vertical'
                                 Camera:
                                     id: camera
+                                    index: 0
                                     resolution: (640, 480)
                                     play: False
                                 ToggleButton:
@@ -59,14 +59,38 @@ MDScreen:
                             title: "Реузльтат сканирования"
                             icon: "magnify"
 
+
                         Tab:
                             id: tab3
                             name: 'tab3'
                             title: "Справка"
                             icon: "chat-question"
-
                             BoxLayout:
-
+                                orientation: 'vertical'
+                                MDLabel:
+                                    text: "Добро пожаловать в QR Reader !!!"
+                                    halign: "center"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text: "Давайте начнем работу !!!"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:" Данное приложение работает следующим образом:"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:"1. перейдите во вкладку камера и включите ее"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:"2. наведите камеру на QR-код и сделайте снимок нажав на соответсвующую кнопку"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:"3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -76,7 +100,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "QR Reader"
-                    text: "NAET V0.4"
+                    text: "NAET V0.9"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
@@ -84,20 +108,20 @@ MDScreen:
 
                 DrawerClickableItem:
                     icon: "github"
+                    on_press: app.github()
                     text: "Исходный код"
 
                 DrawerClickableItem:
                     icon: "brush"
+                    on_press: app.style_change()
                     text: "Поменять стиль"
 
                 DrawerClickableItem:
-                    icon: "cash"
-                    text: "Спонсировать"
-
-                DrawerClickableItem:
                     icon: "share-variant"
+                    on_press: app.show_grid_bottom_sheet()
                     text: "Поделится"
 
                 DrawerClickableItem:
                     icon: "account-edit"
+                    on_press: app.write_to_developer()
                     text: "Написать разработчику"
