@@ -93,7 +93,7 @@ fullscreen = 0
 #icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
 
 # (list) Permissions
-android.permissions = CAMERA,ACCESS_DOWNLOAD_MANAGER
+android.permissions = CAMERA,ACCESS_DOWNLOAD_MANAGER,ACCESS_NETWORK_CONDITIONS,ACCESS_WIFI_STATE,ACCESS_NETWORK_STATE
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
