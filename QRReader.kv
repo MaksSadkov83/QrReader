@@ -12,7 +12,7 @@ MDScreen:
 
             MDScreen:
                 MDBoxLayout:
-                    md_bg_color: "#FFFFFF"
+                    md_bg_color: "#96C9DD"
                     orientation: "vertical"
 
                     MDTopAppBar:
@@ -53,13 +53,29 @@ MDScreen:
                                     size_hint_y: None
                                     height: '48dp'
                                     on_press: app.capture()
+
                         Tab:
                             id: tab2
                             name: 'tab2'
                             title: "Реузльтат сканирования"
                             icon: "magnify"
 
-
+                            MDBoxLayout:
+                                orientation: "vertical"
+                                FitImage:
+                                    source: "table.jpeg"
+                                    size_hint_y: .9
+                                BoxLayout:
+                                    orientation: "horizontal"
+                                    MDLabel:
+                                        text: "  № ИНВ: \n\n  Модель: \n\n  Кабинет:"
+                                        theme_text_color: 'ContrastParentBackground'
+                                    MDLabel:
+                                        text: "122343124\n\nSony Proektor\n\n36"
+                                        theme_text_color: 'ContrastParentBackground'
+                                MDTextField:
+                                    hint_text: "Введите ИНВ №"
+                                    mode: "fill"
                         Tab:
                             id: tab3
                             name: 'tab3'
@@ -68,31 +84,19 @@ MDScreen:
                             BoxLayout:
                                 orientation: 'vertical'
                                 MDLabel:
-                                    text: "Добро пожаловать в QR Reader !!!"
+                                    text: "Добро пожаловать в QR Reader !!!\n\n\n\n\n"
                                     halign: "center"
                                     theme_text_color: 'ContrastParentBackground'
                                 MDLabel:
-                                    text: "Давайте начнем работу !!!"
+                                    text: "  \n\nДавайте начнем работу !!!\n\n   Данное приложение работает следующим образом: \n    1. перейдите во вкладку камера и включите ее\n\n    2. наведите камеру на QR-код и сделайте снимок нажав на соответсвующую кнопку\n\n   3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм\n\n\n\n"
                                     halign: "left"
                                     theme_text_color: 'ContrastParentBackground'
                                 MDLabel:
-                                    text:" Данное приложение работает следующим образом:"
+                                    text:"   \n\n\nЕсли агоритм не смог обработать фотку введите Инв. № во вкладке 'Результат'"
                                     halign: "left"
                                     theme_text_color: 'ContrastParentBackground'
                                 MDLabel:
-                                    text:"1. перейдите во вкладку камера и включите ее"
-                                    halign: "left"
-                                    theme_text_color: 'ContrastParentBackground'
-                                MDLabel:
-                                    text:"2. наведите камеру на QR-код и сделайте снимок нажав на соответсвующую кнопку"
-                                    halign: "left"
-                                    theme_text_color: 'ContrastParentBackground'
-                                MDLabel:
-                                    text:"3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм"
-                                    halign: "left"
-                                    theme_text_color: 'ContrastParentBackground'
-                                MDLabel:
-                                    text:"Если агоритм не смог обработать фотку введите Инв. № во вкладке 'Результат'"
+                                    text:"   Если у вас есть вопросы можите написать разработчику"
                                     halign: "left"
                                     theme_text_color: 'ContrastParentBackground'
 
@@ -104,7 +108,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "QR Reader"
-                    text: "NAET V1.2"
+                    text: "NAET V1.4"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
