@@ -35,7 +35,7 @@ class QRReaderApp(MDApp):
         according to their captured time and date.
         '''
         camera = self.root.ids['camera']
-        camera.export_to_png("/storage/emulated/0/Pictures/IMGQrcode/QR_CODE.png")
+        camera.export_to_png("/storage/emulated/0/Pictures/QR_CODE.png")
 
     def github(self):
         url = "https://github.com/MaksSadkov83/QrReader/releases"
