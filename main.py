@@ -6,11 +6,11 @@ from kivymd.uix.floatlayout import MDFloatLayout
 
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
-import time
 import webbrowser
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
+
 class QRReaderApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Dark"
@@ -35,11 +35,7 @@ class QRReaderApp(MDApp):
         according to their captured time and date.
         '''
         camera = self.root.ids['camera']
-        timestr = time.strftime("%Y%m%d_%H%M%S")
-        camera.export_to_png("IMG_{}.png".format(timestr))
-
-    def reader_qr(self):
-        pass
+        camera.export_to_png("/storage/emulated/0/Pictures/IMGQrcode/QR_CODE.png")
 
     def github(self):
         url = "https://github.com/MaksSadkov83/QrReader/releases"

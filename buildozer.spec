@@ -37,7 +37,7 @@ version = 1.8
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==2.1.0,android,pillow,opencv-python,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15
+requirements = python3,kivy==2.1.0,android,pillow,opencv-python,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15,cython,android.permissions,plyer,pyjnius
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -93,7 +93,7 @@ fullscreen = 0
 #icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
 
 # (list) Permissions
-android.permissions = CAMERA
+android.permissions = CAMERA,WRITE_EXTERNAL_STORAGE
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
