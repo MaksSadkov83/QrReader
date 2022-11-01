@@ -7,6 +7,7 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
 import webbrowser
+import cv2
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
@@ -28,14 +29,24 @@ class QRReaderApp(MDApp):
         '''
         pass
 
+    def switch_tab_by_name(self):
+        self.root.ids.tabs.switch_tab("magnify", search_by='icon')
 
     def capture(self):
         '''
         Function to capture the images and give them the names
         according to their captured time and date.
         '''
+        #/storage/emulated/0/Pictures/
         camera = self.root.ids['camera']
+        result = self.root.ids['result']
         camera.export_to_png("/storage/emulated/0/Pictures/QR_CODE.png")
+        self.switch_tab_by_name()
+        qrimg = cv2.imread("/storage/emulated/0/Pictures/QR_CODE.png")
+        detector = cv2.QRCodeDetector()
+        data, bbox, clear_qrcode = detector.detectAndDecode(qrimg)
+        result.text = data
+
 
     def github(self):
         url = "https://github.com/MaksSadkov83/QrReader/releases"

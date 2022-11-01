@@ -61,7 +61,8 @@ MDScreen:
                                     text: 'Capture'
                                     size_hint_y: None
                                     height: '48dp'
-                                    on_press: app.capture()
+                                    on_press:
+                                        app.capture()
 
                         Tab:
                             id: tab2
@@ -72,6 +73,7 @@ MDScreen:
                             MDBoxLayout:
                                 orientation: "vertical"
                                 FitImage:
+                                    id: img_result
                                     source: ""
                                     size_hint_y: .9
                                 BoxLayout:
@@ -80,6 +82,7 @@ MDScreen:
                                         text: "  № ИНВ: \n\n  Модель: \n\n  Кабинет:"
                                         theme_text_color: 'ContrastParentBackground'
                                     MDLabel:
+                                        id: result
                                         text: " "
                                         theme_text_color: 'ContrastParentBackground'
                                 MDTextField:
@@ -117,7 +120,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "QR Reader"
-                    text: "NAET V1.8"
+                    text: "NAET V2.0"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
