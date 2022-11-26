@@ -6,16 +6,19 @@ from kivymd.uix.floatlayout import MDFloatLayout
 
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
+from kivymd.uix.dialog import  MDDialog
+
 import webbrowser
 import cv2
+import sqlite3
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
 
-class QRReaderApp(MDApp):
+class InvNaetApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Dark"
-        return Builder.load_file("QRReader.kv")
+        return Builder.load_file("InvNaet.kv")
 
     def on_tab_switch(
         self, instance_tabs, instance_tab, instance_tab_label, tab_text
@@ -29,35 +32,40 @@ class QRReaderApp(MDApp):
         '''
         pass
 
-    def switch_tab_by_name(self):
-        self.root.ids.tabs.switch_tab("magnify", search_by='icon')
 
     def capture(self):
         '''
         Function to capture the images and give them the names
         according to their captured time and date.
         '''
-        #/storage/emulated/0/Pictures/
         camera = self.root.ids['camera']
         result = self.root.ids['result']
-        camera.export_to_png("/storage/emulated/0/Pictures/QR_CODE.png")
-        self.switch_tab_by_name()
-        qrimg = cv2.imread("/storage/emulated/0/Pictures/QR_CODE.png")
+        camera.export_to_png("QRCODE.png")
+        img_qr = cv2.imread("QRCODE.png")
         detector = cv2.QRCodeDetector()
-        data, bbox, clear_qrcode = detector.detectAndDecode(qrimg)
-        result.text = data
-
+        data, bbpx, clear_qr = detector.detectAndDecode(img_qr)
+        try:
+            conn = sqlite3.connect("QR.db")
+            cur = conn.cursor()
+            res = cur.execute(f"SELECT * FROM qr WHERE inv='{data}'")
+            result_bd = res.fetchone()
+            result.text = f"{result_bd[2]}\n\n{result_bd[1]}\n\n{result_bd[3]}\n\n{result_bd[4]}\n\n{result_bd[5]} RUB"
+            self.root.ids.tabs.switch_tab(search_by="icon", name_tab="magnify")
+        except Exception as _ex:
+            dialog = MDDialog(title="Что-то пошло не так :(",
+                              text="Похоже алгоритм не смог обработать фотографию. Возможная ошибка:\n1. На фотографии нету qr-кода\n2. Фотография размыта\nПожалуйста, попробуйте снова")
+            dialog.open()
+        finally:
+            if conn:
+                conn.close()
 
     def github(self):
         url = "https://github.com/MaksSadkov83/QrReader/releases"
         webbrowser.open(url, new=0, autoraise=True)
 
-    def style_change(self):
-        pass
-
     def callback_for_menu_items(self, *args):
         if args[0] == "Telegram":
-            url = "https://web.telegram.org/k/#1187734754"
+            url = "https://t.me/+79110673159"
             webbrowser.open(url, new=0, autoraise=True)
         elif args[0] == "WhatsApp":
             url = "http://Wa.me/+79110673159"
@@ -66,11 +74,6 @@ class QRReaderApp(MDApp):
             url = "https://vk.com/smnxzmn"
             webbrowser.open(url, new=0, autoraise=True)
         toast(args[0])
-
-    # DrawerClickableItem:
-    # icon: "share-variant"
-    # on_press: app.show_grid_bottom_sheet()
-    # text: "Поделится"
 
     def show_grid_bottom_sheet(self):
         bottom_sheet_menu = MDGridBottomSheet()
@@ -88,4 +91,4 @@ class QRReaderApp(MDApp):
         bottom_sheet_menu.open()
 
 if __name__ == "__main__":
-    QRReaderApp().run()
+    InvNaetApp().run()

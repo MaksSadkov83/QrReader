@@ -1,0 +1,130 @@
+<DrawerClickableItem@MDNavigationDrawerItem>
+    focus_color: "#e7e4c0"
+    text_color: "#4a4939"
+    icon_color: "#4a4939"
+    selected_color: "#0c6c4d"
+
+MDScreen:
+
+    MDNavigationLayout:
+
+        MDScreenManager:
+
+            MDScreen:
+                MDBoxLayout:
+                    md_bg_color: "#96C9DD"
+                    orientation: "vertical"
+
+                    MDTopAppBar:
+                        title: "Инвентаризация НАЭТ"
+                        elevation: 4
+                        pos_hint: {"top": 1}
+                        md_bg_color: "#095EB1"
+                        specific_text_color: "#FFFFFF"
+                        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+
+                    MDTabs:
+                        pos_hint: {"top": 2}
+                        suze_hint_y: None
+                        on_tab_switch: app.on_tab_switch(*args)
+                        height: "48dp"
+                        tab_indicator_anim: False
+                        id: tabs
+
+                        Tab:
+                            id: tab1
+                            name: 'tab1'
+                            title: "Камера"
+                            icon: "camera"
+                            BoxLayout:
+                                orientation: 'vertical'
+                                Camera:
+                                    id: camera
+                                    index: 0
+                                    resolution: (640, 480)
+                                    play: False
+
+                                ToggleButton:
+                                    text: 'Play'
+                                    on_press: camera.play = not camera.play
+                                    size_hint_y: None
+                                    height: '48dp'
+                                Button:
+                                    text: 'Capture'
+                                    size_hint_y: None
+                                    height: '48dp'
+                                    on_press:app.capture()
+
+                        Tab:
+                            id: tab2
+                            name: 'tab2'
+                            title: "Реузльтат сканирования"
+                            icon: "magnify"
+
+                            MDBoxLayout:
+                                md_bg_color: "#f7e2a8"
+                                orientation: "vertical"
+                                MDTextField:
+                                    hint_text: "Введите ИНВ №"
+                                    mode: "fill"
+                                BoxLayout:
+                                    orientation: "horizontal"
+                                    MDLabel:
+                                        text: "  № ИНВ: \n\n  Модель: \n\n  Кабинет: \n\n Дата покупки: \n\n Стоимость:"
+                                        theme_text_color: 'ContrastParentBackground'
+                                    MDLabel:
+                                        id: result
+                                        text: " "
+                                        theme_text_color: 'ContrastParentBackground'
+                                Button:
+                                    text: 'Найти'
+                                    size_hint_y: None
+                                    height: '48dp'
+
+                        Tab:
+                            id: tab3
+                            name: 'tab3'
+                            title: "Справка"
+                            icon: "chat-question"
+                            BoxLayout:
+                                orientation: 'vertical'
+                                MDLabel:
+                                    text: "Добро пожаловать в QR Reader !!!\n\n\n\n\n"
+                                    halign: "center"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text: "\n\n   Давайте начнем работу !!!\n\n   Данное приложение работает следующим образом: \n    1. перейдите во вкладку камера и включите ее\n\n    2. наведите камеру на QR-код и сделайте снимок нажав на соответсвующую кнопку\n\n   3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм\n\n\n\n"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:"\n\n\n   Если агоритм не смог обработать фотку введите Инв. № во вкладке 'Результат'"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+                                MDLabel:
+                                    text:"   Если у вас есть вопросы можите написать разработчику"
+                                    halign: "left"
+                                    theme_text_color: 'ContrastParentBackground'
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            radius: (0, 16, 16, 0)
+
+            MDNavigationDrawerMenu:
+
+                MDNavigationDrawerHeader:
+                    title: "Инвентаризация НАЭТ"
+                    text: "NAET V1.8"
+                    title_color: "#FFFFFF"
+                    text_color: "#4a4939"
+                    spacing: "4dp"
+                    padding: "12dp", 0, 0, "56dp"
+
+                DrawerClickableItem:
+                    icon: "github"
+                    on_press: app.github()
+                    text: "Исполняемый файл (Android, IoS)"
+
+                DrawerClickableItem:
+                    icon: "account-edit"
+                    on_press: app.show_grid_bottom_sheet()
+                    text: "Написать разработчику"

@@ -7,7 +7,7 @@ title = QR Reader
 package.name = qrreader
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.qrreader
+package.domain = org.test
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -29,7 +29,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 2.1
+version = 1.8
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
@@ -37,7 +37,7 @@ version = 2.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = kivy==2.1.0,android,opencv,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15
+requirements = kivy==2.1.0,opencv,https://github.com/kivymd/KivyMD/archive/master.zip,sdl2_ttf==2.0.15
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -66,7 +66,7 @@ orientation = portrait
 osx.python_version = 3
 
 # Kivy version to use
-osx.kivy_version = 1.9.1
+osx.kivy_version = 2.1.0
 
 #
 # Android specific
@@ -93,7 +93,7 @@ fullscreen = 0
 #icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
 
 # (list) Permissions
-android.permissions = CAMERA, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
+android.permissions = CAMERA, INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
@@ -102,13 +102,13 @@ android.permissions = CAMERA, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 android.api = 28
 
 # (int) Minimum API your APK / AAB will support.
-android.minapi = 27
+android.minapi = 21
 
 # (int) Android SDK version to use
-#android.sdk = 20
+android.sdk = 20
 
 # (str) Android NDK version to use
-#android.ndk = 23b
+android.ndk = 23b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
