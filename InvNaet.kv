@@ -65,6 +65,7 @@ MDScreen:
                                 md_bg_color: "#f7e2a8"
                                 orientation: "vertical"
                                 MDTextField:
+                                    id: text_field
                                     hint_text: "Введите ИНВ №"
                                     mode: "fill"
                                 BoxLayout:
@@ -80,6 +81,7 @@ MDScreen:
                                     text: 'Найти'
                                     size_hint_y: None
                                     height: '48dp'
+                                    on_press: app.search_by_inv()
 
                         Tab:
                             id: tab3

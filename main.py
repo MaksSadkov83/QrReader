@@ -40,8 +40,8 @@ class InvNaetApp(MDApp):
         '''
         camera = self.root.ids['camera']
         result = self.root.ids['result']
-        camera.export_to_png("QRCODE.png")
-        img_qr = cv2.imread("QRCODE.png")
+        camera.export_to_png("/storage/emulated/0/Pictures/QRCODE.png")
+        img_qr = cv2.imread("/storage/emulated/0/Pictures/QRCODE.png")
         detector = cv2.QRCodeDetector()
         data, bbpx, clear_qr = detector.detectAndDecode(img_qr)
         try:
@@ -51,9 +51,27 @@ class InvNaetApp(MDApp):
             result_bd = res.fetchone()
             result.text = f"{result_bd[2]}\n\n{result_bd[1]}\n\n{result_bd[3]}\n\n{result_bd[4]}\n\n{result_bd[5]} RUB"
             self.root.ids.tabs.switch_tab(search_by="icon", name_tab="magnify")
-        except Exception as _ex:
+        except:
             dialog = MDDialog(title="Что-то пошло не так :(",
-                              text="Похоже алгоритм не смог обработать фотографию. Возможная ошибка:\n1. На фотографии нету qr-кода\n2. Фотография размыта\nПожалуйста, попробуйте снова")
+                              text="Похоже алгоритм не смог обработать фотографию.\nВозможные ошибки:\n1. На фотографии нету qr-кода;\n2. Фотография размыта.\nПожалуйста, попробуйте снова.")
+            dialog.open()
+        finally:
+            if conn:
+                conn.close()
+
+    def search_by_inv(self):
+        text_field = self.root.ids['text_field']
+        result = self.root.ids['result']
+
+        try:
+            conn = sqlite3.connect("QR.db")
+            cur = conn.cursor()
+            res = cur.execute(f"SELECT * FROM qr WHERE inv='{text_field.text}'")
+            result_bd = res.fetchone()
+            result.text = f"{result_bd[2]}\n\n{result_bd[1]}\n\n{result_bd[3]}\n\n{result_bd[4]}\n\n{result_bd[5]} RUB"
+        except:
+            dialog = MDDialog(title="Что-то пошло не так :(",
+                              text="Похоже алгоритм не смог найти оборудование.\nВозможные ошибки:\n1. Вы неправильно ввели № ИНВ, пожалуйста, попробуйте снова;\n2. Оборудования с таким ИНВ нету в базе. Обратитесь к администратору.")
             dialog.open()
         finally:
             if conn:
