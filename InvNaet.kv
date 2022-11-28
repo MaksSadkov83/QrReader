@@ -43,6 +43,13 @@ MDScreen:
                                     index: 0
                                     resolution: (640, 480)
                                     play: False
+                                    canvas.before:
+                                        PushMatrix
+                                        Rotate:
+                                            angle: -90
+                                            origin: self.center
+                                    canvas.after:
+                                        PopMatrix
 
                                 ToggleButton:
                                     text: 'Play'
