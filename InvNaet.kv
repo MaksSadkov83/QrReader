@@ -90,6 +90,12 @@ MDScreen:
                                     height: '48dp'
                                     on_press: app.search_by_inv()
 
+                                Button:
+                                    text: 'Добавить оборудование'
+                                    size_hint_y: None
+                                    height: '48dp'
+                                    on_press: app.content_add_equipment()
+
                         Tab:
                             id: tab3
                             name: 'tab3'
@@ -137,3 +143,44 @@ MDScreen:
                     icon: "account-edit"
                     on_press: app.show_grid_bottom_sheet()
                     text: "Написать разработчику"
+
+<AddEquipmentContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "440dp"
+
+    MDTextField:
+        hint_text: "№ ИНВ"
+
+    MDTextField:
+        hint_text: "Модель"
+
+    MDTextField:
+        hint_text: "Кабинет"
+
+    MDTextField:
+        hint_text: "Стоимость"
+
+    MDBoxLayout:
+        orientation: "horizontal"
+        MDFloatingActionButton:
+            icon: "calendar"
+            on_release: root.show_date_picker()
+        MDLabel:
+            text: ""
+        MDLabel:
+            id: datapicker
+            text: ""
+
+    MDBoxLayout:
+        orientation: "horizontal"
+        Button:
+            text: "Добавить"
+            size_hint_y: None
+            height: '48dp'
+
+        Button:
+            text: "Очистить форму"
+            size_hint_y: None
+            height: '48dp'

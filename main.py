@@ -3,14 +3,59 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.floatlayout import MDFloatLayout
+# from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
-from kivymd.uix.dialog import  MDDialog
+from kivymd.uix.dialog import MDDialog
 
 import webbrowser
 import cv2
 import sqlite3
+
+
+ContentAddDialog = """
+MDBoxLayout:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "440dp"
+                                
+    MDTextField:
+        hint_text: "№ ИНВ"
+                                
+    MDTextField:
+        hint_text: "Модель"
+                                
+    MDTextField:
+        hint_text: "Кабинет"
+                                
+    MDTextField:
+        hint_text: "Стоимость"
+                                
+    MDBoxLayout:
+        orientation: "horizontal"
+        MDFloatingActionButton:
+            icon: "calendar"
+            on_release: app.show_date_picker()
+        MDLabel:
+            text: ""
+        MDLabel:
+            id: datapicker
+            text: ""
+                                
+    MDBoxLayout:
+        orientation: "horizontal"
+        Button:
+            text: "Add"
+            size_hint_y: None
+            height: '48dp'
+                                
+        Button:
+            text: "Reset"
+            size_hint_y: None
+            height: '48dp'
+"""
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
@@ -32,6 +77,8 @@ class InvNaetApp(MDApp):
         '''
         pass
 
+    def show_date_picker(self):
+        pass
 
     def capture(self):
         '''
@@ -76,6 +123,14 @@ class InvNaetApp(MDApp):
         finally:
             if conn:
                 conn.close()
+
+    def content_add_equipment(self):
+        self.dialog = MDDialog(
+            title="Добавление оборудования:",
+            type="custom",
+            content_cls= Builder.load_string(ContentAddDialog),
+        )
+        self.dialog.open()
 
     def github(self):
         url = "https://github.com/MaksSadkov83/QrReader/releases"
