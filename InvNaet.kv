@@ -74,6 +74,7 @@ MDScreen:
                                 MDTextField:
                                     id: text_field
                                     hint_text: "Введите ИНВ №"
+                                    max_text_length: 10
                                     mode: "fill"
                                 BoxLayout:
                                     orientation: "horizontal"
@@ -128,7 +129,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "Инвентаризация НАЭТ"
-                    text: "NAET V1.8"
+                    text: "NAET V3.1"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
@@ -143,6 +144,26 @@ MDScreen:
                     icon: "account-edit"
                     on_press: app.show_grid_bottom_sheet()
                     text: "Написать разработчику"
+
+                DrawerClickableItem:
+                    icon: "database-minus"
+                    text: "Удалить имущество"
+
+                DrawerClickableItem:
+                    icon: "database-refresh"
+                    text: "Обновить имущество"
+
+                DrawerClickableItem:
+                    icon: "database-export"
+                    text: "Отправить отчет"
+
+                MDNavigationDrawerDivider:
+
+                MDNavigationDrawerLabel:
+                    text: "Разработчик MaksRaptor543"
+
+                MDNavigationDrawerLabel:
+                    text: "Вкусяншки можно занести в 38:)"
 
 <AddEquipmentContent>:
     orientation: "vertical"
@@ -164,23 +185,26 @@ MDScreen:
 
     MDBoxLayout:
         orientation: "horizontal"
+
         MDFloatingActionButton:
             icon: "calendar"
-            on_release: root.show_date_picker()
+            on_release: root.show_datapicker()
+
         MDLabel:
             text: ""
+
         MDLabel:
-            id: datapicker
+            id: calendar
             text: ""
 
     MDBoxLayout:
         orientation: "horizontal"
         Button:
-            text: "Добавить"
+            text: "Add"
             size_hint_y: None
             height: '48dp'
 
         Button:
-            text: "Очистить форму"
+            text: "Reset"
             size_hint_y: None
             height: '48dp'

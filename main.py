@@ -3,59 +3,20 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.floatlayout import MDFloatLayout
-# from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
 from kivymd.uix.dialog import MDDialog
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.pickers.datepicker.datepicker import MDDatePicker
 
 import webbrowser
 import cv2
 import sqlite3
 
-
-ContentAddDialog = """
-MDBoxLayout:
-    orientation: "vertical"
-    spacing: "12dp"
-    size_hint_y: None
-    height: "440dp"
-                                
-    MDTextField:
-        hint_text: "№ ИНВ"
-                                
-    MDTextField:
-        hint_text: "Модель"
-                                
-    MDTextField:
-        hint_text: "Кабинет"
-                                
-    MDTextField:
-        hint_text: "Стоимость"
-                                
-    MDBoxLayout:
-        orientation: "horizontal"
-        MDFloatingActionButton:
-            icon: "calendar"
-            on_release: app.show_date_picker()
-        MDLabel:
-            text: ""
-        MDLabel:
-            id: datapicker
-            text: ""
-                                
-    MDBoxLayout:
-        orientation: "horizontal"
-        Button:
-            text: "Add"
-            size_hint_y: None
-            height: '48dp'
-                                
-        Button:
-            text: "Reset"
-            size_hint_y: None
-            height: '48dp'
-"""
+class AddEquipmentContent(MDBoxLayout):
+    def show_datapicker(self):
+        MDDatePicker().open()
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
@@ -75,9 +36,6 @@ class InvNaetApp(MDApp):
         :param instance_tab_label: <kivymd.uix.tab.MDTabsLabel object>;
         :param tab_text: text or name icon of tab;
         '''
-        pass
-
-    def show_date_picker(self):
         pass
 
     def capture(self):
@@ -128,7 +86,7 @@ class InvNaetApp(MDApp):
         self.dialog = MDDialog(
             title="Добавление оборудования:",
             type="custom",
-            content_cls= Builder.load_string(ContentAddDialog),
+            content_cls= AddEquipmentContent(),
         )
         self.dialog.open()
 
