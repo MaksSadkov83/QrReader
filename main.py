@@ -14,25 +14,30 @@ import webbrowser
 import cv2
 import sqlite3
 
+class UpdateEquipmentContent(MDBoxLayout):
+    pass
+
 class DeleteEquipmentContent(MDBoxLayout):
     def delete_equipment(self):
         inv_delete = self.ids['inv_delete']
 
-        try:
+        if inv_delete.text != "":
             conn = sqlite3.connect("QR.db")
             cur = conn.cursor()
-            cur.execute(f"DELETE FROM qr WHERE inv='{inv_delete.text}'")
-            conn.commit()
+            cur.execute(f"SELECT * FROM qr WHERE inv = '{inv_delete.text}'")
+            if cur.fetchone() is None:
+                MDDialog(title="Что-то пошло не так :(",
+                         text=f"Имущества с номером {inv_delete.text} нет в базе данных").open()
+            else:
+                cur.execute(f"DELETE FROM qr WHERE inv='{inv_delete.text}'")
+                conn.commit()
+                MDDialog(title=f"Имущество с номером {inv_delete.text} успешно удалено !!!").open()
 
-            MDDialog(title=f"Имущество с номером {inv_delete.text} успешно удалено !!!").open()
+                inv_delete.text = ""
 
-            inv_delete.text = ""
-        except:
-            MDDialog(title="Что-то пошло не так :(",
-                     text=f"Возможные ошибки: \n1. Нету соединения с базой данных \n2. Имущества с номером {inv_delete.text} нет в базе данных").open()
-        finally:
-            if conn:
-                conn.close()
+            conn.close()
+        else:
+            MDDialog(title="Поле обязательно для заполнения !!!").open()
 
     def reset_form(self):
         inv_delete = self.ids['inv_delete']
@@ -71,23 +76,33 @@ class AddEquipmentContent(MDBoxLayout):
         price = self.ids['price']
         data = self.ids['calendar']
 
-        try:
-            conn = sqlite3.connect("QR.db")
-            cur = conn.cursor()
-            cur.execute(f"INSERT INTO qr(name, inv, cabinet, date, price) VALUES('{model.text}', '{inv.text}', '{cabinet.text}', '{data.text}', '{price.text}')")
-            conn.commit()
-            MDDialog(title="Запись успешно добавлена !!!").open()
-            inv.text = ""
-            model.text = ""
-            cabinet.text = ""
-            price.text = ""
-            data.text = ""
+        if inv.text != "" and model.text != "" and cabinet.text != "" and price.text != "" and data.text != "":
+            if price.text.isdigit():
+               if int(price.text) >= 0:
+                   try:
+                       conn = sqlite3.connect("QR.db")
+                       cur = conn.cursor()
+                       cur.execute(
+                           f"INSERT INTO qr(name, inv, cabinet, date, price) VALUES('{model.text}', '{inv.text}', '{cabinet.text}', '{data.text}', '{price.text}')")
+                       conn.commit()
+                       MDDialog(title="Запись успешно добавлена !!!").open()
+                       inv.text = ""
+                       model.text = ""
+                       cabinet.text = ""
+                       price.text = ""
+                       data.text = ""
 
-        except:
-            MDDialog(title="Что-то пошло не так :(", text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
-        finally:
-            if conn:
-                conn.close()
+                   except:
+                       MDDialog(title="Что-то пошло не так :(",
+                                text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
+                   finally:
+                       if conn:
+                           conn.close()
+            else:
+                MDDialog(title="Поле 'Цена' должна быть цыфрой больше или равно 0").open()
+                price.text = ""
+        else:
+            MDDialog(title="Не все поля формы заполнены !!!").open()
 
     def reset_form(self):
         inv = self.ids['inv']
@@ -163,6 +178,7 @@ class InvNaetApp(MDApp):
             dialog = MDDialog(title="Что-то пошло не так :(",
                               text="Похоже алгоритм не смог найти оборудование.\nВозможные ошибки:\n1. Вы неправильно ввели № ИНВ, пожалуйста, попробуйте снова;\n2. Оборудования с таким ИНВ нету в базе. Обратитесь к администратору.")
             dialog.open()
+            result.text = ""
         finally:
             if conn:
                 conn.close()

@@ -129,7 +129,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "Инвентаризация НАЭТ"
-                    text: "NAET V3.3"
+                    text: "NAET V3.4"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
@@ -230,7 +230,7 @@ MDScreen:
     MDBoxLayout:
         orientation: "horizontal"
         Button:
-            text: "Add"
+            text: "Delete"
             size_hint_y: None
             height: '48dp'
             on_press: root.delete_equipment()
@@ -240,3 +240,25 @@ MDScreen:
             size_hint_y: None
             height: '48dp'
             on_press: root.reset_form()
+
+<UpdateEquipmentContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "140dp"
+
+    MDTextField:
+        id: inv_update
+        hint_text: "№ ИНВ для обновления"
+
+    MDBoxLayout:
+        orientation: "horizontal"
+        Button:
+            text: "Find"
+            size_hint_y: None
+            height: '48dp'
+
+        Button:
+            text: "Reset"
+            size_hint_y: None
+            height: '48dp'
