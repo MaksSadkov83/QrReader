@@ -129,7 +129,7 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "Инвентаризация НАЭТ"
-                    text: "NAET V3.1"
+                    text: "NAET V3.3"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
@@ -147,10 +147,12 @@ MDScreen:
 
                 DrawerClickableItem:
                     icon: "database-minus"
+                    on_press: app.content_delete_equipment()
                     text: "Удалить имущество"
 
                 DrawerClickableItem:
                     icon: "database-refresh"
+                    on_press: app.content_update_equipment()
                     text: "Обновить имущество"
 
                 DrawerClickableItem:
@@ -163,7 +165,7 @@ MDScreen:
                     text: "Разработчик MaksRaptor543"
 
                 MDNavigationDrawerLabel:
-                    text: "Вкусяншки можно занести в 38:)"
+                    text: "Вкусяншки можно занести в 38 :)"
 
 <AddEquipmentContent>:
     orientation: "vertical"
@@ -172,15 +174,19 @@ MDScreen:
     height: "440dp"
 
     MDTextField:
+        id: inv
         hint_text: "№ ИНВ"
 
     MDTextField:
+        id: model
         hint_text: "Модель"
 
     MDTextField:
+        id: cabinet
         hint_text: "Кабинет"
 
     MDTextField:
+        id: price
         hint_text: "Стоимость"
 
     MDBoxLayout:
@@ -203,8 +209,34 @@ MDScreen:
             text: "Add"
             size_hint_y: None
             height: '48dp'
+            on_press: root.add_equipment()
 
         Button:
             text: "Reset"
             size_hint_y: None
             height: '48dp'
+            on_press: root.reset_form()
+
+<DeleteEquipmentContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "140dp"
+
+    MDTextField:
+        id: inv_delete
+        hint_text: "№ ИНВ удаляемого имущества"
+
+    MDBoxLayout:
+        orientation: "horizontal"
+        Button:
+            text: "Add"
+            size_hint_y: None
+            height: '48dp'
+            on_press: root.delete_equipment()
+
+        Button:
+            text: "Reset"
+            size_hint_y: None
+            height: '48dp'
+            on_press: root.reset_form()

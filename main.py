@@ -14,9 +14,93 @@ import webbrowser
 import cv2
 import sqlite3
 
+class DeleteEquipmentContent(MDBoxLayout):
+    def delete_equipment(self):
+        inv_delete = self.ids['inv_delete']
+
+        try:
+            conn = sqlite3.connect("QR.db")
+            cur = conn.cursor()
+            cur.execute(f"DELETE FROM qr WHERE inv='{inv_delete.text}'")
+            conn.commit()
+
+            MDDialog(title=f"Имущество с номером {inv_delete.text} успешно удалено !!!").open()
+
+            inv_delete.text = ""
+        except:
+            MDDialog(title="Что-то пошло не так :(",
+                     text=f"Возможные ошибки: \n1. Нету соединения с базой данных \n2. Имущества с номером {inv_delete.text} нет в базе данных").open()
+        finally:
+            if conn:
+                conn.close()
+
+    def reset_form(self):
+        inv_delete = self.ids['inv_delete']
+        inv_delete.text = ""
+
 class AddEquipmentContent(MDBoxLayout):
+    date = None
+
     def show_datapicker(self):
-        MDDatePicker().open()
+        datapicker = MDDatePicker()
+        datapicker.bind(on_save=self.on_save, on_cancel=self.on_cancel)
+        datapicker.open()
+
+    def on_save(self, instance, value, date_range):
+        '''
+        Events called when the "OK" dialog box button is clicked.
+
+        :type instance: <kivymd.uix.picker.MDDatePicker object>;
+        :param value: selected date;
+        :type value: <class 'datetime.date'>;
+        :param date_range: list of 'datetime.date' objects in the selected range;
+        :type date_range: <class 'list'>;
+        '''
+
+        self.date = str(value)
+        data = self.ids['calendar']
+        data.text = str(value)
+
+    def on_cancel(self, instance, value):
+        '''Events called when the "CANCEL" dialog box button is clicked.'''
+
+    def add_equipment(self):
+        inv = self.ids['inv']
+        model = self.ids['model']
+        cabinet = self.ids['cabinet']
+        price = self.ids['price']
+        data = self.ids['calendar']
+
+        try:
+            conn = sqlite3.connect("QR.db")
+            cur = conn.cursor()
+            cur.execute(f"INSERT INTO qr(name, inv, cabinet, date, price) VALUES('{model.text}', '{inv.text}', '{cabinet.text}', '{data.text}', '{price.text}')")
+            conn.commit()
+            MDDialog(title="Запись успешно добавлена !!!").open()
+            inv.text = ""
+            model.text = ""
+            cabinet.text = ""
+            price.text = ""
+            data.text = ""
+
+        except:
+            MDDialog(title="Что-то пошло не так :(", text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
+        finally:
+            if conn:
+                conn.close()
+
+    def reset_form(self):
+        inv = self.ids['inv']
+        model = self.ids['model']
+        cabinet = self.ids['cabinet']
+        price = self.ids['price']
+        data = self.ids['calendar']
+
+        inv.text = ""
+        model.text = ""
+        cabinet.text = ""
+        price.text = ""
+        data.text = ""
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
@@ -74,6 +158,7 @@ class InvNaetApp(MDApp):
             res = cur.execute(f"SELECT * FROM qr WHERE inv='{text_field.text}'")
             result_bd = res.fetchone()
             result.text = f"{result_bd[2]}\n\n{result_bd[1]}\n\n{result_bd[3]}\n\n{result_bd[4]}\n\n{result_bd[5]} RUB"
+            text_field.text = ""
         except:
             dialog = MDDialog(title="Что-то пошло не так :(",
                               text="Похоже алгоритм не смог найти оборудование.\nВозможные ошибки:\n1. Вы неправильно ввели № ИНВ, пожалуйста, попробуйте снова;\n2. Оборудования с таким ИНВ нету в базе. Обратитесь к администратору.")
@@ -87,6 +172,22 @@ class InvNaetApp(MDApp):
             title="Добавление оборудования:",
             type="custom",
             content_cls= AddEquipmentContent(),
+        )
+        self.dialog.open()
+
+    def content_delete_equipment(self):
+        self.dialog = MDDialog(
+            title="Удаление имущества:",
+            type="custom",
+            content_cls=DeleteEquipmentContent(),
+        )
+        self.dialog.open()
+
+    def content_update_equipment(self):
+        self.dialog = MDDialog(
+            title="Обновление имущества:",
+            type="custom",
+            content_cls=UpdateEquipmentContent(),
         )
         self.dialog.open()
 
