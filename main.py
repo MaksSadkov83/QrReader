@@ -9,16 +9,97 @@ from kivymd.uix.bottomsheet import MDGridBottomSheet
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.pickers.datepicker.datepicker import MDDatePicker
+from kivymd.uix.textfield.textfield import MDTextField
+from kivymd.uix.button import MDFloatingActionButton
+from kivymd.uix.label import MDLabel
+from kivy.uix.button import Button
 
 import webbrowser
 import cv2
 import sqlite3
 
-class UpdateEquipmentContent(MDBoxLayout):
-    pass
+class UpdatePropertyContent(MDBoxLayout):
+    date = None
 
-class DeleteEquipmentContent(MDBoxLayout):
-    def delete_equipment(self):
+    def find_update_property(self):
+
+        def show_datapicker_update(x):
+            print(x)
+            datapicker = MDDatePicker()
+            datapicker.bind(on_save=on_save, on_cancel=on_cancel)
+            datapicker.open()
+
+        def on_save(instance, value, date_range):
+            '''
+            Events called when the "OK" dialog box button is clicked.
+
+            :type instance: <kivymd.uix.picker.MDDatePicker object>;
+            :param value: selected date;
+            :type value: <class 'datetime.date'>;
+            :param date_range: list of 'datetime.date' objects in the selected range;
+            :type date_range: <class 'list'>;
+            '''
+            self.date = str(value)
+            label_claendar.text = str(value)
+
+        def on_cancel(instance, value):
+            '''Events called when the "CANCEL" dialog box button is clicked.'''
+
+        def loud_update_content(x):
+            conn = sqlite3.connect("QR.db")
+            cur = conn.cursor()
+            cur.execute(f"UPDATE qr SET name='{model.text}', inv='{inv.text}', cabinet='{cabinet.text}', date='{self.date}', price='{price.text}' WHERE id='{result_bd[0]}'")
+            conn.commit()
+            MDDialog(title=f"Имущество с инвентарным номером {inv.text} обновлена !!!").open()
+
+
+        inv_update = self.ids['inv_update']
+        button_update = self.ids['button_update']
+
+        conn = sqlite3.connect("QR.db")
+        cur = conn.cursor()
+        res = cur.execute(f"SELECT * FROM qr WHERE inv='{inv_update.text}'")
+        result_bd = res.fetchone()
+
+        if result_bd is None:
+            MDDialog(title=f"Имущества с ивнентарным номером {inv_update.text} нет в базу данных").open()
+
+        else:
+            self.remove_widget(inv_update)
+            self.remove_widget(button_update)
+
+            inv = MDTextField(id="inv", hint_text="№ ИНВ")
+            model = MDTextField(id="model", hint_text="Модель")
+            cabinet = MDTextField(id="cabinet", hint_text="Кабинет")
+            price = MDTextField(id="price", hint_text="Стоимость")
+            calendar_button = MDFloatingActionButton(icon="calendar")
+            calendar_button.bind(on_release=show_datapicker_update)
+            box = MDBoxLayout(orientation="horizontal")
+            label_claendar = MDLabel(text="", id="calendar")
+            box1 = MDBoxLayout(orientation="horizontal")
+            update_button = Button(text="Update", size_hint_y=None, height="48dp")
+            update_button.bind(on_press=loud_update_content)
+
+            self.add_widget(inv)
+            self.add_widget(model)
+            self.add_widget(cabinet)
+            self.add_widget(price)
+            box.add_widget(calendar_button)
+            box.add_widget(MDLabel(text=""))
+            box.add_widget(label_claendar)
+            self.add_widget(box)
+            box1.add_widget(update_button)
+            self.add_widget(box1)
+
+            inv.text = f"{result_bd[2]}"
+            model.text = f"{result_bd[1]}"
+            cabinet.text = f"{result_bd[3]}"
+            price.text = f"{result_bd[5]}"
+            label_claendar.text = f"{result_bd[4]}"
+            self.date = f"{result_bd[4]}"
+
+class DeletePropertyContent(MDBoxLayout):
+    def delete_property(self):
         inv_delete = self.ids['inv_delete']
 
         if inv_delete.text != "":
@@ -43,7 +124,7 @@ class DeleteEquipmentContent(MDBoxLayout):
         inv_delete = self.ids['inv_delete']
         inv_delete.text = ""
 
-class AddEquipmentContent(MDBoxLayout):
+class AddPropertyContent(MDBoxLayout):
     date = None
 
     def show_datapicker(self):
@@ -69,7 +150,7 @@ class AddEquipmentContent(MDBoxLayout):
     def on_cancel(self, instance, value):
         '''Events called when the "CANCEL" dialog box button is clicked.'''
 
-    def add_equipment(self):
+    def add_property(self):
         inv = self.ids['inv']
         model = self.ids['model']
         cabinet = self.ids['cabinet']
@@ -77,32 +158,29 @@ class AddEquipmentContent(MDBoxLayout):
         data = self.ids['calendar']
 
         if inv.text != "" and model.text != "" and cabinet.text != "" and price.text != "" and data.text != "":
-            if price.text.isdigit():
-               if int(price.text) >= 0:
-                   try:
-                       conn = sqlite3.connect("QR.db")
-                       cur = conn.cursor()
-                       cur.execute(
-                           f"INSERT INTO qr(name, inv, cabinet, date, price) VALUES('{model.text}', '{inv.text}', '{cabinet.text}', '{data.text}', '{price.text}')")
-                       conn.commit()
-                       MDDialog(title="Запись успешно добавлена !!!").open()
-                       inv.text = ""
-                       model.text = ""
-                       cabinet.text = ""
-                       price.text = ""
-                       data.text = ""
+            if float(price.text) >= 0:
+                try:
+                    conn = sqlite3.connect("QR.db")
+                    cur = conn.cursor()
+                    cur.execute(
+                        f"INSERT INTO qr(name, inv, cabinet, date, price) VALUES('{model.text}', '{inv.text}', '{cabinet.text}', '{data.text}', '{price.text}')")
+                    conn.commit()
+                    MDDialog(title="Запись успешно добавлена !!!").open()
+                    inv.text = ""
+                    model.text = ""
+                    cabinet.text = ""
+                    price.text = ""
+                    data.text = ""
 
-                   except:
-                       MDDialog(title="Что-то пошло не так :(",
-                                text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
-                   finally:
-                       if conn:
-                           conn.close()
+                except:
+                    MDDialog(title="Что-то пошло не так :(",
+                             text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
+                finally:
+                    if conn:
+                        conn.close()
             else:
-                MDDialog(title="Поле 'Цена' должна быть цыфрой больше или равно 0").open()
+                MDDialog(title="Поле 'Цена' должна быть цифрой больше или равно 0").open()
                 price.text = ""
-        else:
-            MDDialog(title="Не все поля формы заполнены !!!").open()
 
     def reset_form(self):
         inv = self.ids['inv']
@@ -183,27 +261,27 @@ class InvNaetApp(MDApp):
             if conn:
                 conn.close()
 
-    def content_add_equipment(self):
+    def content_add_property(self):
         self.dialog = MDDialog(
             title="Добавление оборудования:",
             type="custom",
-            content_cls= AddEquipmentContent(),
+            content_cls= AddPropertyContent(),
         )
         self.dialog.open()
 
-    def content_delete_equipment(self):
+    def content_delete_property(self):
         self.dialog = MDDialog(
             title="Удаление имущества:",
             type="custom",
-            content_cls=DeleteEquipmentContent(),
+            content_cls=DeletePropertyContent(),
         )
         self.dialog.open()
 
-    def content_update_equipment(self):
+    def content_update_property(self):
         self.dialog = MDDialog(
             title="Обновление имущества:",
             type="custom",
-            content_cls=UpdateEquipmentContent(),
+            content_cls=UpdatePropertyContent(),
         )
         self.dialog.open()
 

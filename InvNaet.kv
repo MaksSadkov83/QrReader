@@ -86,16 +86,16 @@ MDScreen:
                                         text: " "
                                         theme_text_color: 'ContrastParentBackground'
                                 Button:
-                                    text: 'Найти'
+                                    text: 'Find'
                                     size_hint_y: None
                                     height: '48dp'
                                     on_press: app.search_by_inv()
 
                                 Button:
-                                    text: 'Добавить оборудование'
+                                    text: 'Add property'
                                     size_hint_y: None
                                     height: '48dp'
-                                    on_press: app.content_add_equipment()
+                                    on_press: app.content_add_property()
 
                         Tab:
                             id: tab3
@@ -147,12 +147,12 @@ MDScreen:
 
                 DrawerClickableItem:
                     icon: "database-minus"
-                    on_press: app.content_delete_equipment()
+                    on_press: app.content_delete_property()
                     text: "Удалить имущество"
 
                 DrawerClickableItem:
                     icon: "database-refresh"
-                    on_press: app.content_update_equipment()
+                    on_press: app.content_update_property()
                     text: "Обновить имущество"
 
                 DrawerClickableItem:
@@ -167,7 +167,7 @@ MDScreen:
                 MDNavigationDrawerLabel:
                     text: "Вкусяншки можно занести в 38 :)"
 
-<AddEquipmentContent>:
+<AddPropertyContent>:
     orientation: "vertical"
     spacing: "12dp"
     size_hint_y: None
@@ -209,7 +209,7 @@ MDScreen:
             text: "Add"
             size_hint_y: None
             height: '48dp'
-            on_press: root.add_equipment()
+            on_press: root.add_property()
 
         Button:
             text: "Reset"
@@ -217,7 +217,7 @@ MDScreen:
             height: '48dp'
             on_press: root.reset_form()
 
-<DeleteEquipmentContent>:
+<DeletePropertyContent>:
     orientation: "vertical"
     spacing: "12dp"
     size_hint_y: None
@@ -233,7 +233,7 @@ MDScreen:
             text: "Delete"
             size_hint_y: None
             height: '48dp'
-            on_press: root.delete_equipment()
+            on_press: root.delete_property()
 
         Button:
             text: "Reset"
@@ -241,22 +241,24 @@ MDScreen:
             height: '48dp'
             on_press: root.reset_form()
 
-<UpdateEquipmentContent>:
+<UpdatePropertyContent>:
     orientation: "vertical"
     spacing: "12dp"
     size_hint_y: None
-    height: "140dp"
+    height: "440dp"
 
     MDTextField:
         id: inv_update
         hint_text: "№ ИНВ для обновления"
 
     MDBoxLayout:
+        id: button_update
         orientation: "horizontal"
         Button:
             text: "Find"
             size_hint_y: None
             height: '48dp'
+            on_press: root.find_update_property()
 
         Button:
             text: "Reset"
