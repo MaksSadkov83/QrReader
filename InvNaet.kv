@@ -43,13 +43,7 @@ MDScreen:
                                     index: 0
                                     resolution: (640, 480)
                                     play: False
-                                    canvas.before:
-                                        PushMatrix
-                                        Rotate:
-                                            angle: -90
-                                            origin: self.center
-                                    canvas.after:
-                                        PopMatrix
+
 
                                 ToggleButton:
                                     text: 'Play'
@@ -69,22 +63,37 @@ MDScreen:
                             icon: "magnify"
 
                             MDBoxLayout:
-                                md_bg_color: "#f7e2a8"
                                 orientation: "vertical"
+
                                 MDTextField:
                                     id: text_field
                                     hint_text: "Введите ИНВ №"
                                     max_text_length: 10
                                     mode: "fill"
-                                BoxLayout:
+
+                                MDBoxLayout:
+                                    md_bg_color: "#ffea9d"
                                     orientation: "horizontal"
+                                    adaptive_height: True
+
+                                    Button:
+                                        id: button
+                                        size_hint_y: None
+                                        text: "Фильтр"
+                                        height: "48dp"
+                                        on_press: app.filter_property_cabinet()
+
                                     MDLabel:
-                                        text: "  № ИНВ: \n\n  Модель: \n\n  Кабинет: \n\n Дата покупки: \n\n Стоимость:"
+                                        id: filter
+                                        text: ""
+                                        halign: "center"
                                         theme_text_color: 'ContrastParentBackground'
-                                    MDLabel:
-                                        id: result
-                                        text: " "
-                                        theme_text_color: 'ContrastParentBackground'
+
+                                MDScrollView:
+                                    MDList:
+                                        id: filter-result
+
+
                                 Button:
                                     text: 'Find'
                                     size_hint_y: None
@@ -92,10 +101,10 @@ MDScreen:
                                     on_press: app.search_by_inv()
 
                                 Button:
-                                    text: 'Add property'
+                                    text: 'Send report'
+                                    on_press: app.content_send_database()
                                     size_hint_y: None
                                     height: '48dp'
-                                    on_press: app.content_add_property()
 
                         Tab:
                             id: tab3
@@ -129,21 +138,21 @@ MDScreen:
 
                 MDNavigationDrawerHeader:
                     title: "Инвентаризация НАЭТ"
-                    text: "NAET V3.4"
+                    text: "NAET V3.6"
                     title_color: "#FFFFFF"
                     text_color: "#4a4939"
                     spacing: "4dp"
                     padding: "12dp", 0, 0, "56dp"
 
                 DrawerClickableItem:
-                    icon: "github"
-                    on_press: app.github()
-                    text: "Исполняемый файл (Android, IoS)"
-
-                DrawerClickableItem:
                     icon: "account-edit"
                     on_press: app.show_grid_bottom_sheet()
                     text: "Написать разработчику"
+
+                DrawerClickableItem:
+                    icon: "database-edit"
+                    text: "Добавить имущество"
+                    on_press: app.content_add_property()
 
                 DrawerClickableItem:
                     icon: "database-minus"
@@ -154,10 +163,6 @@ MDScreen:
                     icon: "database-refresh"
                     on_press: app.content_update_property()
                     text: "Обновить имущество"
-
-                DrawerClickableItem:
-                    icon: "database-export"
-                    text: "Отправить отчет"
 
                 MDNavigationDrawerDivider:
 

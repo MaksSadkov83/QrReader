@@ -13,6 +13,8 @@ from kivymd.uix.textfield.textfield import MDTextField
 from kivymd.uix.button import MDFloatingActionButton
 from kivymd.uix.label import MDLabel
 from kivy.uix.button import Button
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import OneLineListItem
 
 import webbrowser
 import cv2
@@ -24,7 +26,6 @@ class UpdatePropertyContent(MDBoxLayout):
     def find_update_property(self):
 
         def show_datapicker_update(x):
-            print(x)
             datapicker = MDDatePicker()
             datapicker.bind(on_save=on_save, on_cancel=on_cancel)
             datapicker.open()
@@ -51,6 +52,7 @@ class UpdatePropertyContent(MDBoxLayout):
             cur.execute(f"UPDATE qr SET name='{model.text}', inv='{inv.text}', cabinet='{cabinet.text}', date='{self.date}', price='{price.text}' WHERE id='{result_bd[0]}'")
             conn.commit()
             MDDialog(title=f"Имущество с инвентарным номером {inv.text} обновлена !!!").open()
+            conn.close()
 
 
         inv_update = self.ids['inv_update']
@@ -97,6 +99,8 @@ class UpdatePropertyContent(MDBoxLayout):
             price.text = f"{result_bd[5]}"
             label_claendar.text = f"{result_bd[4]}"
             self.date = f"{result_bd[4]}"
+
+        conn.close()
 
 class DeletePropertyContent(MDBoxLayout):
     def delete_property(self):
@@ -157,13 +161,13 @@ class AddPropertyContent(MDBoxLayout):
         price = self.ids['price']
         data = self.ids['calendar']
 
-        if inv.text != "" and model.text != "" and cabinet.text != "" and price.text != "" and data.text != "":
+        if inv.text.upper() != "" and model.text != "" and cabinet.text != "" and price.text != "" and data.text != "":
             if float(price.text) >= 0:
                 try:
                     conn = sqlite3.connect("QR.db")
                     cur = conn.cursor()
                     cur.execute(
-                        f"INSERT INTO qr(name, inv, cabinet, date, price) VALUES('{model.text}', '{inv.text}', '{cabinet.text}', '{data.text}', '{price.text}')")
+                        f"INSERT INTO qr(name, inv, cabinet, date, price, chek) VALUES('{model.text}', '{inv.text.upper()}', '{cabinet.text}', '{data.text}', '{price.text}', '0');")
                     conn.commit()
                     MDDialog(title="Запись успешно добавлена !!!").open()
                     inv.text = ""
@@ -172,7 +176,8 @@ class AddPropertyContent(MDBoxLayout):
                     price.text = ""
                     data.text = ""
 
-                except:
+                except Exception as _ex:
+                    print(_ex)
                     MDDialog(title="Что-то пошло не так :(",
                              text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
                 finally:
@@ -203,9 +208,7 @@ class InvNaetApp(MDApp):
         self.theme_cls.theme_style = "Dark"
         return Builder.load_file("InvNaet.kv")
 
-    def on_tab_switch(
-        self, instance_tabs, instance_tab, instance_tab_label, tab_text
-    ):
+    def on_tab_switch(self, instance_tabs, instance_tab, instance_tab_label, tab_text):
         '''
         Called when switching tabs.
         :type instance_tabs: <kivymd.uix.tab.MDTabs object>;
@@ -221,73 +224,191 @@ class InvNaetApp(MDApp):
         according to their captured time and date.
         '''
         camera = self.root.ids['camera']
-        result = self.root.ids['result']
+        result = self.root.ids['filter-result']
+        filter = self.root.ids['filter']
         camera.export_to_png("/storage/emulated/0/Pictures/QRCODE.png")
         img_qr = cv2.imread("/storage/emulated/0/Pictures/QRCODE.png")
         detector = cv2.QRCodeDetector()
         data, bbpx, clear_qr = detector.detectAndDecode(img_qr)
-        try:
-            conn = sqlite3.connect("QR.db")
-            cur = conn.cursor()
-            res = cur.execute(f"SELECT * FROM qr WHERE inv='{data}'")
-            result_bd = res.fetchone()
-            result.text = f"{result_bd[2]}\n\n{result_bd[1]}\n\n{result_bd[3]}\n\n{result_bd[4]}\n\n{result_bd[5]} RUB"
-            self.root.ids.tabs.switch_tab(search_by="icon", name_tab="magnify")
-        except:
-            dialog = MDDialog(title="Что-то пошло не так :(",
-                              text="Похоже алгоритм не смог обработать фотографию.\nВозможные ошибки:\n1. На фотографии нету qr-кода;\n2. Фотография размыта.\nПожалуйста, попробуйте снова.")
-            dialog.open()
-        finally:
-            if conn:
-                conn.close()
+
+        if result.children:
+            try:
+                conn = sqlite3.connect("QR.db")
+                cur = conn.cursor()
+                cur.execute(f"SELECT * FROM qr WHERE inv='{data}'")
+                res = cur.fetchone()
+
+                if res[3][:2] != filter.text[:2]:
+                    item = OneLineListItem(text=res[1], bg_color="#f7ff0d", theme_text_color="ContrastParentBackground")
+                    result.add_widget(item)
+
+                for row in result.children:
+                    if row.id == res[2]:
+                        row.bg_color = "#0dff11"
+                        row.theme_text_color = "ContrastParentBackground"
+
+                cur.execute(f"UPDATE qr SET chek='1' WHERE inv='{data}'")
+                conn.commit()
+
+
+            except Exception as _ex:
+                print(_ex)
+                MDDialog().open()
+            finally:
+                if conn:
+                    conn.close()
+        else:
+            MDDialog(title="Пожалуйста выберите кабинет").open()
 
     def search_by_inv(self):
+        '''
+        Функций поиска имущества оп инвентарному номеру
+        :return:
+        '''
         text_field = self.root.ids['text_field']
-        result = self.root.ids['result']
+        result = self.root.ids['filter-result']
+        filter = self.root.ids['filter']
 
-        try:
-            conn = sqlite3.connect("QR.db")
-            cur = conn.cursor()
-            res = cur.execute(f"SELECT * FROM qr WHERE inv='{text_field.text}'")
-            result_bd = res.fetchone()
-            result.text = f"{result_bd[2]}\n\n{result_bd[1]}\n\n{result_bd[3]}\n\n{result_bd[4]}\n\n{result_bd[5]} RUB"
-            text_field.text = ""
-        except:
-            dialog = MDDialog(title="Что-то пошло не так :(",
-                              text="Похоже алгоритм не смог найти оборудование.\nВозможные ошибки:\n1. Вы неправильно ввели № ИНВ, пожалуйста, попробуйте снова;\n2. Оборудования с таким ИНВ нету в базе. Обратитесь к администратору.")
-            dialog.open()
-            result.text = ""
-        finally:
-            if conn:
-                conn.close()
+        # Проверка выбран ли кабинет для сканирования
+        if result.children:
+            # Поиск имущества
+            try:
+                conn = sqlite3.connect("QR.db")
+                cur = conn.cursor()
+                cur.execute(f"SELECT * FROM qr WHERE inv = '{text_field.text.upper()}'")
+                res = cur.fetchone()
+
+                # Проверка, есть ли найденно имущестов в списке (совпадение с фильтром), если нет добавляется как желтая пометка
+                if res[3][:2] != filter.text[:2]:
+                    item = OneLineListItem(text=res[1], bg_color="#f7ff0d", theme_text_color="ContrastParentBackground")
+                    result.add_widget(item)
+
+                # Поиск имущества в списке и закрашивание его в списке зеленым
+                for row in result.children:
+                    if row.id == res[2]:
+                        row.bg_color = "#0dff11"
+                        row.theme_text_color = "ContrastParentBackground"
+
+                # Обновление состояния с "0" на "1"
+                cur.execute(f"UPDATE qr SET chek='1' WHERE inv='{text_field.text.upper()}'")
+                conn.commit()
+                text_field.text = ""
+
+            # Вывод сообщения о ошибке
+            except Exception as _ex:
+                print(_ex)
+                MDDialog(title="Что-то пошло не так :(",
+                         text=f"Алгоритм не нашел имущество с номером {text_field.text.upper()}. \nВозможные ошибки:\n"
+                              f"1. имущества с таким № ИНВ нет в базе данных;\n2. Неправильно введен № ИНВ.\n"
+                              f"Пожалуйста попробуйте снова.").open()
+            finally:
+                if conn:
+                    conn.close()
+
+        else:
+            MDDialog(title="Пожалуйста выберите кабинет").open()
+
+    def filter_property_cabinet(self):
+        '''
+        Функция создания списка с фильтрами
+
+        :return:
+        '''
+        # список с кабинетами
+        cabinet = ["спортзал", "2", "3", "4", "мед", "столовая",
+                   "6", "7", "8", "9", "10", "11", "12", "13",
+                   "14", "15", "16", "17", "20", "22", "23", "24",
+                   "25", "26", "27", "28", "29", "30", "31", "32",
+                   "33", "34", "36", "37", "38", "акт", "хим.анализ",
+                   "театр", "охрана", "холл", "склад", "подвал", "подвал-общежитие",
+                   "общ"]
+
+        # сосздание выпадающего списка с фильтрами
+        menu_items = [
+            {
+                "text": f"{i}",
+                "viewclass": "OneLineListItem",
+                "on_release": lambda x=f"{i}": self.filter_property_find(x),
+            } for i in cabinet
+        ]
+        MDDropdownMenu(
+            caller=self.root.ids.button,
+            items=menu_items,
+            width_mult=4,
+        ).open()
+
+    def filter_property_find(self, x):
+        '''
+        Функция поиска оборудования по фильтру
+
+        :param x:
+        :return:
+        '''
+        result = self.root.ids['filter-result']
+        filter = self.root.ids['filter']
+        filter.text = x
+
+        conn = sqlite3.connect("QR.db")
+        cur = conn.cursor()
+
+        if x == 'общ' or x == 'акт' or x == 'мед' or x == '20':
+            cur.execute(f"SELECT name, inv, chek FROM qr WHERE cabinet LIKE '{x}%'")
+        else: cur.execute(f"SELECT name, inv, chek FROM qr WHERE cabinet = '{x}'")
+
+        res = cur.fetchall()
+
+        if result.children:
+            result.clear_widgets()
+
+        color = {
+            0:"#7d7d7d",
+            1: "#0dff11"
+        }
+
+        bg_color = {
+            0:"Primary",
+            1:"ContrastParentBackground",
+        }
+
+        for row in res:
+            item = OneLineListItem(text=row[0], bg_color=color[row[2]], theme_text_color=bg_color[row[2]], id=row[1])
+            result.add_widget(item)
+
+        conn.close()
 
     def content_add_property(self):
-        self.dialog = MDDialog(
+            MDDialog(
             title="Добавление оборудования:",
             type="custom",
             content_cls= AddPropertyContent(),
-        )
-        self.dialog.open()
+        ).open()
 
     def content_delete_property(self):
-        self.dialog = MDDialog(
+        MDDialog(
             title="Удаление имущества:",
             type="custom",
             content_cls=DeletePropertyContent(),
-        )
-        self.dialog.open()
+        ).open()
 
     def content_update_property(self):
-        self.dialog = MDDialog(
+            MDDialog(
             title="Обновление имущества:",
             type="custom",
             content_cls=UpdatePropertyContent(),
-        )
-        self.dialog.open()
+        ).open()
 
-    def github(self):
-        url = "https://github.com/MaksSadkov83/QrReader/releases"
-        webbrowser.open(url, new=0, autoraise=True)
+    def content_send_database(self):
+        result = self.root.ids['filter-result']
+
+        for row in result.children:
+            row.bg_color = "#7d7d7d"
+            row.theme_text_color = "Primary"
+
+        conn = sqlite3.connect("QR.db")
+        cur = conn.cursor()
+        cur.execute("UPDATE qr SET chek='0'")
+        conn.commit()
+        conn.close()
 
     def callback_for_menu_items(self, *args):
         if args[0] == "Telegram":
