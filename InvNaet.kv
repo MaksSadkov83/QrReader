@@ -4,268 +4,216 @@
     icon_color: "#4a4939"
     selected_color: "#0c6c4d"
 
-MDScreen:
+MDScreenManager:
+    id: screen
 
-    MDNavigationLayout:
+    MDScreen:
+        name: "loginview"
+        MDFloatLayout:
+            Image:
+                source: './1.png'
+                size: self.texture_size
+                pos_hint: {'center_x': .5, 'center_y': .75}
 
-        MDScreenManager:
+            MDTextField:
+                id: login_name
+                hint_text: 'Введите свой логин'
+                icon_left: "account"
+                mode: "rectangle"
+                pos_hint: {'center_x': .5, 'center_y': .6}
+                size_hint_x: None
+                width: '348dp'
 
-            MDScreen:
-                MDBoxLayout:
-                    md_bg_color: "#96C9DD"
-                    orientation: "vertical"
+            MDTextField:
+                id: password
+                hint_text: 'Введите свой пароль'
+                icon_left: "key-variant"
+                mode: "rectangle"
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                size_hint_x: None
+                width: '348dp'
+                min_text_length: 5
+                max_text_length: 10
+                password: True
 
-                    MDTopAppBar:
-                        title: "Инвентаризация НАЭТ"
-                        elevation: 4
-                        pos_hint: {"top": 1}
-                        md_bg_color: "#095EB1"
-                        specific_text_color: "#FFFFFF"
-                        left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+            MDRaisedButton:
+                id: login
+                type: "large"
+                text: "Войти в систему"
+                pos_hint: {'center_x': .5, 'center_y': .4}
+                on_press: app.login()
 
-                    MDTabs:
-                        pos_hint: {"top": 2}
-                        suze_hint_y: None
-                        on_tab_switch: app.on_tab_switch(*args)
-                        height: "48dp"
-                        tab_indicator_anim: False
-                        id: tabs
+    MDScreen:
+        name: "Load"
+        MDSpinner:
+            size_hint: None, None
+            size: dp(146), dp(146)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            active: True
 
-                        Tab:
-                            id: tab1
-                            name: 'tab1'
-                            title: "Камера"
-                            icon: "camera"
-                            BoxLayout:
-                                orientation: 'vertical'
-                                Camera:
-                                    id: camera
-                                    index: 0
-                                    resolution: (640, 480)
-                                    play: False
+    MDScreen:
+        name: "Main"
+        MDNavigationLayout:
 
+            MDScreenManager:
 
-                                ToggleButton:
-                                    text: 'Play'
-                                    on_press: camera.play = not camera.play
-                                    size_hint_y: None
-                                    height: '48dp'
-                                Button:
-                                    text: 'Capture'
-                                    size_hint_y: None
-                                    height: '48dp'
-                                    on_press:app.capture()
+                MDScreen:
+                    MDBoxLayout:
+                        md_bg_color: "#96C9DD"
+                        orientation: "vertical"
 
-                        Tab:
-                            id: tab2
-                            name: 'tab2'
-                            title: "Реузльтат сканирования"
-                            icon: "magnify"
+                        MDTopAppBar:
+                            title: "Инвентаризация НАЭТ"
+                            elevation: 4
+                            pos_hint: {"top": 1}
+                            md_bg_color: "#095EB1"
+                            specific_text_color: "#FFFFFF"
+                            left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
 
-                            MDBoxLayout:
-                                orientation: "vertical"
+                        MDTabs:
+                            pos_hint: {"top": 2}
+                            suze_hint_y: None
+                            on_tab_switch: app.on_tab_switch(*args)
+                            height: "48dp"
+                            tab_indicator_anim: False
+                            id: tabs
 
-                                MDTextField:
-                                    id: text_field
-                                    hint_text: "Введите ИНВ №"
-                                    max_text_length: 10
-                                    mode: "fill"
+                            Tab:
+                                id: tab1
+                                name: 'tab1'
+                                title: "Камера"
+                                icon: "camera"
+                                BoxLayout:
+                                    orientation: 'vertical'
+                                    Camera:
+                                        id: camera
+                                        index: 0
+                                        resolution: (1280, 960)
+                                        play: False
+                                        allow_stretch: True
+                                        keep_ratio: False
+                                        canvas.before:
+                                            PushMatrix
+                                            Rotate:
+                                                angle: -90
+                                                origin: self.center
+                                        canvas.after:
+                                            PopMatrix
+
+                                    ToggleButton:
+                                        text: 'Включить камеру'
+                                        on_press: camera.play = not camera.play
+                                        size_hint_y: None
+                                        height: '48dp'
+                                    Button:
+                                        text: 'Сделать снимок'
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_press:app.capture()
+
+                            Tab:
+                                id: tab2
+                                name: 'tab2'
+                                title: "Реузльтат сканирования"
+                                icon: "magnify"
 
                                 MDBoxLayout:
-                                    md_bg_color: "#ffea9d"
-                                    orientation: "horizontal"
-                                    adaptive_height: True
+                                    orientation: "vertical"
+
+                                    MDTextField:
+                                        id: text_field
+                                        hint_text: "Введите ИНВ №"
+                                        max_text_length: 10
+                                        mode: "fill"
+
+                                    MDBoxLayout:
+                                        md_bg_color: "#ffea9d"
+                                        orientation: "horizontal"
+                                        adaptive_height: True
+
+                                        Button:
+                                            id: button
+                                            size_hint_y: None
+                                            text: "Кабинет"
+                                            height: "48dp"
+                                            on_press: app.filter_property_cabinet()
+
+                                        MDLabel:
+                                            id: filter
+                                            text: ""
+                                            halign: "center"
+                                            theme_text_color: 'ContrastParentBackground'
+
+                                    MDScrollView:
+                                        MDList:
+                                            id: filter-result
+
 
                                     Button:
-                                        id: button
+                                        text: 'Найти'
                                         size_hint_y: None
-                                        text: "Фильтр"
-                                        height: "48dp"
-                                        on_press: app.filter_property_cabinet()
+                                        height: '48dp'
+                                        on_press: app.search_by_inv()
 
+                                    Button:
+                                        text: 'Отправить отчет'
+                                        on_press: app.content_send_database()
+                                        size_hint_y: None
+                                        height: '48dp'
+
+                            Tab:
+                                id: tab3
+                                name: 'tab3'
+                                title: "Справка"
+                                icon: "chat-question"
+                                BoxLayout:
+                                    orientation: 'vertical'
                                     MDLabel:
-                                        id: filter
-                                        text: ""
+                                        text: "Добро пожаловать в QR Reader !!!\n\n\n\n\n"
                                         halign: "center"
                                         theme_text_color: 'ContrastParentBackground'
+                                    MDLabel:
+                                        text: "\n\n   Давайте начнем работу !!!\n\n   Данное приложение работает следующим образом: \n    1. перейдите во вкладку камера и включите ее\n\n    2. наведите камеру на QR-код и сделайте снимок нажав на соответсвующую кнопку\n\n   3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм\n\n\n\n"
+                                        halign: "left"
+                                        theme_text_color: 'ContrastParentBackground'
+                                    MDLabel:
+                                        text:"\n\n\n   Если агоритм не смог обработать фотку введите Инв. № во вкладке 'Результат'"
+                                        halign: "left"
+                                        theme_text_color: 'ContrastParentBackground'
+                                    MDLabel:
+                                        text:"   Если у вас есть вопросы можите написать разработчику"
+                                        halign: "left"
+                                        theme_text_color: 'ContrastParentBackground'
 
-                                MDScrollView:
-                                    MDList:
-                                        id: filter-result
+            MDNavigationDrawer:
+                id: nav_drawer
+                radius: (0, 16, 16, 0)
 
+                MDNavigationDrawerMenu:
 
-                                Button:
-                                    text: 'Find'
-                                    size_hint_y: None
-                                    height: '48dp'
-                                    on_press: app.search_by_inv()
+                    MDNavigationDrawerHeader:
+                        id: sidebar
+                        title: "Пользователь:"
+                        text: "InvNAET V4.3"
+                        title_color: "#FFFFFF"
+                        text_color: "#4a4939"
+                        spacing: "4dp"
+                        padding: "12dp", 0, 0, "56dp"
 
-                                Button:
-                                    text: 'Send report'
-                                    on_press: app.content_send_database()
-                                    size_hint_y: None
-                                    height: '48dp'
+                    DrawerClickableItem:
+                        icon: "account-edit"
+                        on_press: app.show_grid_bottom_sheet()
+                        text: "Написать разработчику"
 
-                        Tab:
-                            id: tab3
-                            name: 'tab3'
-                            title: "Справка"
-                            icon: "chat-question"
-                            BoxLayout:
-                                orientation: 'vertical'
-                                MDLabel:
-                                    text: "Добро пожаловать в QR Reader !!!\n\n\n\n\n"
-                                    halign: "center"
-                                    theme_text_color: 'ContrastParentBackground'
-                                MDLabel:
-                                    text: "\n\n   Давайте начнем работу !!!\n\n   Данное приложение работает следующим образом: \n    1. перейдите во вкладку камера и включите ее\n\n    2. наведите камеру на QR-код и сделайте снимок нажав на соответсвующую кнопку\n\n   3. после снимка вас перебросит на вкладку 'Результат' и вам отобразятся данные, которые нашел алгоритм\n\n\n\n"
-                                    halign: "left"
-                                    theme_text_color: 'ContrastParentBackground'
-                                MDLabel:
-                                    text:"\n\n\n   Если агоритм не смог обработать фотку введите Инв. № во вкладке 'Результат'"
-                                    halign: "left"
-                                    theme_text_color: 'ContrastParentBackground'
-                                MDLabel:
-                                    text:"   Если у вас есть вопросы можите написать разработчику"
-                                    halign: "left"
-                                    theme_text_color: 'ContrastParentBackground'
+                    DrawerClickableItem:
+                        icon: "cancel"
+                        on_press: app.quit_app()
+                        text: "Выйти из приложения"
 
-        MDNavigationDrawer:
-            id: nav_drawer
-            radius: (0, 16, 16, 0)
+                    MDNavigationDrawerDivider:
 
-            MDNavigationDrawerMenu:
+                    MDNavigationDrawerLabel:
+                        text: "Разработчик MaksRaptor543"
 
-                MDNavigationDrawerHeader:
-                    title: "Инвентаризация НАЭТ"
-                    text: "NAET V3.6"
-                    title_color: "#FFFFFF"
-                    text_color: "#4a4939"
-                    spacing: "4dp"
-                    padding: "12dp", 0, 0, "56dp"
-
-                DrawerClickableItem:
-                    icon: "account-edit"
-                    on_press: app.show_grid_bottom_sheet()
-                    text: "Написать разработчику"
-
-                DrawerClickableItem:
-                    icon: "database-edit"
-                    text: "Добавить имущество"
-                    on_press: app.content_add_property()
-
-                DrawerClickableItem:
-                    icon: "database-minus"
-                    on_press: app.content_delete_property()
-                    text: "Удалить имущество"
-
-                DrawerClickableItem:
-                    icon: "database-refresh"
-                    on_press: app.content_update_property()
-                    text: "Обновить имущество"
-
-                MDNavigationDrawerDivider:
-
-                MDNavigationDrawerLabel:
-                    text: "Разработчик MaksRaptor543"
-
-                MDNavigationDrawerLabel:
-                    text: "Вкусяншки можно занести в 38 :)"
-
-<AddPropertyContent>:
-    orientation: "vertical"
-    spacing: "12dp"
-    size_hint_y: None
-    height: "440dp"
-
-    MDTextField:
-        id: inv
-        hint_text: "№ ИНВ"
-
-    MDTextField:
-        id: model
-        hint_text: "Модель"
-
-    MDTextField:
-        id: cabinet
-        hint_text: "Кабинет"
-
-    MDTextField:
-        id: price
-        hint_text: "Стоимость"
-
-    MDBoxLayout:
-        orientation: "horizontal"
-
-        MDFloatingActionButton:
-            icon: "calendar"
-            on_release: root.show_datapicker()
-
-        MDLabel:
-            text: ""
-
-        MDLabel:
-            id: calendar
-            text: ""
-
-    MDBoxLayout:
-        orientation: "horizontal"
-        Button:
-            text: "Add"
-            size_hint_y: None
-            height: '48dp'
-            on_press: root.add_property()
-
-        Button:
-            text: "Reset"
-            size_hint_y: None
-            height: '48dp'
-            on_press: root.reset_form()
-
-<DeletePropertyContent>:
-    orientation: "vertical"
-    spacing: "12dp"
-    size_hint_y: None
-    height: "140dp"
-
-    MDTextField:
-        id: inv_delete
-        hint_text: "№ ИНВ удаляемого имущества"
-
-    MDBoxLayout:
-        orientation: "horizontal"
-        Button:
-            text: "Delete"
-            size_hint_y: None
-            height: '48dp'
-            on_press: root.delete_property()
-
-        Button:
-            text: "Reset"
-            size_hint_y: None
-            height: '48dp'
-            on_press: root.reset_form()
-
-<UpdatePropertyContent>:
-    orientation: "vertical"
-    spacing: "12dp"
-    size_hint_y: None
-    height: "440dp"
-
-    MDTextField:
-        id: inv_update
-        hint_text: "№ ИНВ для обновления"
-
-    MDBoxLayout:
-        id: button_update
-        orientation: "horizontal"
-        Button:
-            text: "Find"
-            size_hint_y: None
-            height: '48dp'
-            on_press: root.find_update_property()
-
-        Button:
-            text: "Reset"
-            size_hint_y: None
-            height: '48dp'
+                    MDNavigationDrawerLabel:
+                        text: "Вкусяншки можно занести в 38 :)"

@@ -1,212 +1,73 @@
 from kivy.lang import Builder
+from plyer import storagepath
 
 from kivymd.app import MDApp
+from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.floatlayout import MDFloatLayout
 
 from kivymd.toast import toast
 from kivymd.uix.bottomsheet import MDGridBottomSheet
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.pickers.datepicker.datepicker import MDDatePicker
-from kivymd.uix.textfield.textfield import MDTextField
-from kivymd.uix.button import MDFloatingActionButton
-from kivymd.uix.label import MDLabel
-from kivy.uix.button import Button
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.list import OneLineListItem
+from kivymd.uix.list import TwoLineListItem
+from kivy.clock import Clock
+from functools import partial
 
 import webbrowser
 import cv2
 import sqlite3
 
-class UpdatePropertyContent(MDBoxLayout):
-    date = None
-
-    def find_update_property(self):
-
-        def show_datapicker_update(x):
-            datapicker = MDDatePicker()
-            datapicker.bind(on_save=on_save, on_cancel=on_cancel)
-            datapicker.open()
-
-        def on_save(instance, value, date_range):
-            '''
-            Events called when the "OK" dialog box button is clicked.
-
-            :type instance: <kivymd.uix.picker.MDDatePicker object>;
-            :param value: selected date;
-            :type value: <class 'datetime.date'>;
-            :param date_range: list of 'datetime.date' objects in the selected range;
-            :type date_range: <class 'list'>;
-            '''
-            self.date = str(value)
-            label_claendar.text = str(value)
-
-        def on_cancel(instance, value):
-            '''Events called when the "CANCEL" dialog box button is clicked.'''
-
-        def loud_update_content(x):
-            conn = sqlite3.connect("QR.db")
-            cur = conn.cursor()
-            cur.execute(f"UPDATE qr SET name='{model.text}', inv='{inv.text}', cabinet='{cabinet.text}', date='{self.date}', price='{price.text}' WHERE id='{result_bd[0]}'")
-            conn.commit()
-            MDDialog(title=f"Имущество с инвентарным номером {inv.text} обновлена !!!").open()
-            conn.close()
-
-
-        inv_update = self.ids['inv_update']
-        button_update = self.ids['button_update']
-
-        conn = sqlite3.connect("QR.db")
-        cur = conn.cursor()
-        res = cur.execute(f"SELECT * FROM qr WHERE inv='{inv_update.text}'")
-        result_bd = res.fetchone()
-
-        if result_bd is None:
-            MDDialog(title=f"Имущества с ивнентарным номером {inv_update.text} нет в базу данных").open()
-
-        else:
-            self.remove_widget(inv_update)
-            self.remove_widget(button_update)
-
-            inv = MDTextField(id="inv", hint_text="№ ИНВ")
-            model = MDTextField(id="model", hint_text="Модель")
-            cabinet = MDTextField(id="cabinet", hint_text="Кабинет")
-            price = MDTextField(id="price", hint_text="Стоимость")
-            calendar_button = MDFloatingActionButton(icon="calendar")
-            calendar_button.bind(on_release=show_datapicker_update)
-            box = MDBoxLayout(orientation="horizontal")
-            label_claendar = MDLabel(text="", id="calendar")
-            box1 = MDBoxLayout(orientation="horizontal")
-            update_button = Button(text="Update", size_hint_y=None, height="48dp")
-            update_button.bind(on_press=loud_update_content)
-
-            self.add_widget(inv)
-            self.add_widget(model)
-            self.add_widget(cabinet)
-            self.add_widget(price)
-            box.add_widget(calendar_button)
-            box.add_widget(MDLabel(text=""))
-            box.add_widget(label_claendar)
-            self.add_widget(box)
-            box1.add_widget(update_button)
-            self.add_widget(box1)
-
-            inv.text = f"{result_bd[2]}"
-            model.text = f"{result_bd[1]}"
-            cabinet.text = f"{result_bd[3]}"
-            price.text = f"{result_bd[5]}"
-            label_claendar.text = f"{result_bd[4]}"
-            self.date = f"{result_bd[4]}"
-
-        conn.close()
-
-class DeletePropertyContent(MDBoxLayout):
-    def delete_property(self):
-        inv_delete = self.ids['inv_delete']
-
-        if inv_delete.text != "":
-            conn = sqlite3.connect("QR.db")
-            cur = conn.cursor()
-            cur.execute(f"SELECT * FROM qr WHERE inv = '{inv_delete.text}'")
-            if cur.fetchone() is None:
-                MDDialog(title="Что-то пошло не так :(",
-                         text=f"Имущества с номером {inv_delete.text} нет в базе данных").open()
-            else:
-                cur.execute(f"DELETE FROM qr WHERE inv='{inv_delete.text}'")
-                conn.commit()
-                MDDialog(title=f"Имущество с номером {inv_delete.text} успешно удалено !!!").open()
-
-                inv_delete.text = ""
-
-            conn.close()
-        else:
-            MDDialog(title="Поле обязательно для заполнения !!!").open()
-
-    def reset_form(self):
-        inv_delete = self.ids['inv_delete']
-        inv_delete.text = ""
-
-class AddPropertyContent(MDBoxLayout):
-    date = None
-
-    def show_datapicker(self):
-        datapicker = MDDatePicker()
-        datapicker.bind(on_save=self.on_save, on_cancel=self.on_cancel)
-        datapicker.open()
-
-    def on_save(self, instance, value, date_range):
-        '''
-        Events called when the "OK" dialog box button is clicked.
-
-        :type instance: <kivymd.uix.picker.MDDatePicker object>;
-        :param value: selected date;
-        :type value: <class 'datetime.date'>;
-        :param date_range: list of 'datetime.date' objects in the selected range;
-        :type date_range: <class 'list'>;
-        '''
-
-        self.date = str(value)
-        data = self.ids['calendar']
-        data.text = str(value)
-
-    def on_cancel(self, instance, value):
-        '''Events called when the "CANCEL" dialog box button is clicked.'''
-
-    def add_property(self):
-        inv = self.ids['inv']
-        model = self.ids['model']
-        cabinet = self.ids['cabinet']
-        price = self.ids['price']
-        data = self.ids['calendar']
-
-        if inv.text.upper() != "" and model.text != "" and cabinet.text != "" and price.text != "" and data.text != "":
-            if float(price.text) >= 0:
-                try:
-                    conn = sqlite3.connect("QR.db")
-                    cur = conn.cursor()
-                    cur.execute(
-                        f"INSERT INTO qr(name, inv, cabinet, date, price, chek) VALUES('{model.text}', '{inv.text.upper()}', '{cabinet.text}', '{data.text}', '{price.text}', '0');")
-                    conn.commit()
-                    MDDialog(title="Запись успешно добавлена !!!").open()
-                    inv.text = ""
-                    model.text = ""
-                    cabinet.text = ""
-                    price.text = ""
-                    data.text = ""
-
-                except Exception as _ex:
-                    print(_ex)
-                    MDDialog(title="Что-то пошло не так :(",
-                             text="Возможные ошибки: \n1. Нету соединения с базой данных").open()
-                finally:
-                    if conn:
-                        conn.close()
-            else:
-                MDDialog(title="Поле 'Цена' должна быть цифрой больше или равно 0").open()
-                price.text = ""
-
-    def reset_form(self):
-        inv = self.ids['inv']
-        model = self.ids['model']
-        cabinet = self.ids['cabinet']
-        price = self.ids['price']
-        data = self.ids['calendar']
-
-        inv.text = ""
-        model.text = ""
-        cabinet.text = ""
-        price.text = ""
-        data.text = ""
 
 class Tab(MDFloatLayout, MDTabsBase):
     pass
+
 
 class InvNaetApp(MDApp):
     def build(self):
         self.theme_cls.theme_style = "Dark"
         return Builder.load_file("InvNaet.kv")
+
+    def login(self):
+        sm = self.root
+        login = self.root.ids['login_name']
+        password = self.root.ids['password']
+
+        sm.current = "Load"
+        sm.transition.direction = 'left'
+
+        Clock.schedule_once(partial(self.check, login, password, sm), 5)
+
+    def check(self, login, password, sm, *largs):
+        if login.text == 'maks' and password.text == '12345':
+            sm.current = "Main"
+            sm.transition.direction = 'left'
+            sidebar = self.root.ids['sidebar']
+            sidebar.title += " maks"
+            snackbar = Snackbar(
+                text="Вход успешно выполнен",
+                snackbar_x="10dp",
+                snackbar_y="10dp",
+            )
+            snackbar.open()
+        elif login.text == "" and password.text == "":
+            sm.current = "loginview"
+            sm.transition.direction = 'right'
+            snackbar = Snackbar(
+                text="Логин и пароль пусты",
+                snackbar_x="10dp",
+                snackbar_y="10dp",
+            )
+            snackbar.open()
+        else:
+            sm.current = "loginview"
+            sm.transition.direction = 'right'
+            snackbar = Snackbar(
+                text="Неправильно введен логин или пароль",
+                snackbar_x="10dp",
+                snackbar_y="10dp",
+            )
+            snackbar.open()
 
     def on_tab_switch(self, instance_tabs, instance_tab, instance_tab_label, tab_text):
         '''
@@ -226,8 +87,8 @@ class InvNaetApp(MDApp):
         camera = self.root.ids['camera']
         result = self.root.ids['filter-result']
         filter = self.root.ids['filter']
-        camera.export_to_png("/storage/emulated/0/Pictures/QRCODE.png")
-        img_qr = cv2.imread("/storage/emulated/0/Pictures/QRCODE.png")
+        camera.export_to_png(f"{storagepath.get_pictures_dir()}/QRCODE.png")
+        img_qr = cv2.imread(f"{storagepath.get_pictures_dir()}/QRCODE.png")
         detector = cv2.QRCodeDetector()
         data, bbpx, clear_qr = detector.detectAndDecode(img_qr)
 
@@ -235,25 +96,32 @@ class InvNaetApp(MDApp):
             try:
                 conn = sqlite3.connect("QR.db")
                 cur = conn.cursor()
-                cur.execute(f"SELECT * FROM qr WHERE inv='{data}'")
+                cur.execute(f"SELECT name,inv,cabinet FROM qr WHERE inv='{data}'")
                 res = cur.fetchone()
 
-                if res[3][:2] != filter.text[:2]:
-                    item = OneLineListItem(text=res[1], bg_color="#f7ff0d", theme_text_color="ContrastParentBackground")
+                if res[2][:2] != filter.text[:2]:
+                    MDDialog(title="Найдено имущество находитя не в этом кабинете!!!",
+                             text=f"Имущество {res[0]} с инвентарным номером {res[1]} находится не в этом кабинете. \n"
+                                  f"Он должен находится в кабиете {res[2]}. Имущество помещено в конец списка.").open()
+                    item = TwoLineListItem(text=res[0],
+                                           secondary_text=f'№ ИНВ: {res[1]};    Кабинет: {res[2]}',
+                                           bg_color="#f7ff0d",
+                                           theme_text_color="ContrastParentBackground",
+                                           secondary_theme_text_color='ContrastParentBackground')
                     result.add_widget(item)
 
                 for row in result.children:
-                    if row.id == res[2]:
+                    if row.id == res[1]:
                         row.bg_color = "#0dff11"
                         row.theme_text_color = "ContrastParentBackground"
 
                 cur.execute(f"UPDATE qr SET chek='1' WHERE inv='{data}'")
                 conn.commit()
 
-
             except Exception as _ex:
-                print(_ex)
-                MDDialog().open()
+                MDDialog(title='Что-то пошло не так :(',
+                         text=f'Алгоритм не смог найти имущество {data}!!\n'
+                              'Возможные ошибки:\n1. На фотографии нету qr-кода\n 2. Фотография размыта').open()
             finally:
                 if conn:
                     conn.close()
@@ -275,17 +143,24 @@ class InvNaetApp(MDApp):
             try:
                 conn = sqlite3.connect("QR.db")
                 cur = conn.cursor()
-                cur.execute(f"SELECT * FROM qr WHERE inv = '{text_field.text.upper()}'")
+                cur.execute(f"SELECT name, inv, cabinet FROM qr WHERE inv='{text_field.text}'")
                 res = cur.fetchone()
 
                 # Проверка, есть ли найденно имущестов в списке (совпадение с фильтром), если нет добавляется как желтая пометка
-                if res[3][:2] != filter.text[:2]:
-                    item = OneLineListItem(text=res[1], bg_color="#f7ff0d", theme_text_color="ContrastParentBackground")
+                if res[2][:2] != filter.text[:2]:
+                    MDDialog(title="Найдено имущество находится не в этом кабинете",
+                             text=f"Имущество {res[0]} с инвентарным номером {res[1]} находится не в этом кабинете. \n"
+                                  f"Он должен находится в кабиете {res[2]}").open()
+                    item = TwoLineListItem(text=res[0],
+                                           secondary_text=f'№ ИНВ: {res[1]};    Кабинет: {res[2]}',
+                                           bg_color="#f7ff0d",
+                                           theme_text_color="ContrastParentBackground",
+                                           secondary_theme_text_color='ContrastParentBackground')
                     result.add_widget(item)
 
                 # Поиск имущества в списке и закрашивание его в списке зеленым
                 for row in result.children:
-                    if row.id == res[2]:
+                    if row.id == res[1]:
                         row.bg_color = "#0dff11"
                         row.theme_text_color = "ContrastParentBackground"
 
@@ -296,7 +171,6 @@ class InvNaetApp(MDApp):
 
             # Вывод сообщения о ошибке
             except Exception as _ex:
-                print(_ex)
                 MDDialog(title="Что-то пошло не так :(",
                          text=f"Алгоритм не нашел имущество с номером {text_field.text.upper()}. \nВозможные ошибки:\n"
                               f"1. имущества с таким № ИНВ нет в базе данных;\n2. Неправильно введен № ИНВ.\n"
@@ -317,7 +191,7 @@ class InvNaetApp(MDApp):
         # список с кабинетами
         cabinet = ["спортзал", "2", "3", "4", "мед", "столовая",
                    "6", "7", "8", "9", "10", "11", "12", "13",
-                   "14", "15", "16", "17", "20", "22", "23", "24",
+                   "14", "15", "16", "17", "20", "директор", "22", "23", "24",
                    "25", "26", "27", "28", "29", "30", "31", "32",
                    "33", "34", "36", "37", "38", "акт", "хим.анализ",
                    "театр", "охрана", "холл", "склад", "подвал", "подвал-общежитие",
@@ -351,9 +225,10 @@ class InvNaetApp(MDApp):
         conn = sqlite3.connect("QR.db")
         cur = conn.cursor()
 
-        if x == 'общ' or x == 'акт' or x == 'мед' or x == '20':
+        if x == 'общ' or x == 'акт' or x == 'мед' or x == '20' or x == '10':
             cur.execute(f"SELECT name, inv, chek FROM qr WHERE cabinet LIKE '{x}%'")
-        else: cur.execute(f"SELECT name, inv, chek FROM qr WHERE cabinet = '{x}'")
+        else:
+            cur.execute(f"SELECT name, inv, chek FROM qr WHERE cabinet = '{x}'")
 
         res = cur.fetchall()
 
@@ -361,54 +236,31 @@ class InvNaetApp(MDApp):
             result.clear_widgets()
 
         color = {
-            0:"#7d7d7d",
+            0: "#7d7d7d",
             1: "#0dff11"
         }
 
         bg_color = {
-            0:"Primary",
-            1:"ContrastParentBackground",
+            0: "Primary",
+            1: "ContrastParentBackground",
         }
 
         for row in res:
-            item = OneLineListItem(text=row[0], bg_color=color[row[2]], theme_text_color=bg_color[row[2]], id=row[1])
+            item = TwoLineListItem(
+                text=row[0],
+                secondary_text=f'№ ИНВ: {row[1]}',
+                bg_color=color[row[2]],
+                theme_text_color=bg_color[row[2]],
+                id=row[1]
+            )
+
             result.add_widget(item)
 
         conn.close()
 
-    def content_add_property(self):
-            MDDialog(
-            title="Добавление оборудования:",
-            type="custom",
-            content_cls= AddPropertyContent(),
-        ).open()
-
-    def content_delete_property(self):
-        MDDialog(
-            title="Удаление имущества:",
-            type="custom",
-            content_cls=DeletePropertyContent(),
-        ).open()
-
-    def content_update_property(self):
-            MDDialog(
-            title="Обновление имущества:",
-            type="custom",
-            content_cls=UpdatePropertyContent(),
-        ).open()
-
     def content_send_database(self):
-        result = self.root.ids['filter-result']
-
-        for row in result.children:
-            row.bg_color = "#7d7d7d"
-            row.theme_text_color = "Primary"
-
-        conn = sqlite3.connect("QR.db")
-        cur = conn.cursor()
-        cur.execute("UPDATE qr SET chek='0'")
-        conn.commit()
-        conn.close()
+        MDDialog(title="Отправка найденного имущества на сервер",
+                 text=f"Функция отправляет ID найденного имущества и ID пользователя кто его нашел").open()
 
     def callback_for_menu_items(self, *args):
         if args[0] == "Telegram":
@@ -436,6 +288,18 @@ class InvNaetApp(MDApp):
                 icon_src=item[1],
             )
         bottom_sheet_menu.open()
+
+    def quit_app(self):
+        sm = self.root
+        login = self.root.ids['login_name']
+        password = self.root.ids['password']
+
+        login.text = ""
+        password.text = ""
+
+        sm.current = "loginview"
+        sm.transition.direction = 'right'
+
 
 if __name__ == "__main__":
     InvNaetApp().run()
