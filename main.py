@@ -1,4 +1,5 @@
 from kivy.lang import Builder
+from kivymd.uix.button import MDRaisedButton
 from plyer import storagepath
 
 from kivymd.app import MDApp
@@ -24,6 +25,8 @@ class Tab(MDFloatLayout, MDTabsBase):
 
 
 class InvNaetApp(MDApp):
+    dislog = None
+
     def build(self):
         self.theme_cls.theme_style = "Dark"
         return Builder.load_file("InvNaet.kv")
@@ -37,6 +40,10 @@ class InvNaetApp(MDApp):
         sm.transition.direction = 'left'
 
         Clock.schedule_once(partial(self.check, login, password, sm), 5)
+
+    def close_pop_pup(self, pop_up_widget):
+        self.dislog.dismiss()
+        self.dislog = None
 
     def check(self, login, password, sm, *largs):
         if login.text == 'maks' and password.text == '12345':
@@ -53,21 +60,22 @@ class InvNaetApp(MDApp):
         elif login.text == "" and password.text == "":
             sm.current = "loginview"
             sm.transition.direction = 'right'
-            snackbar = Snackbar(
-                text="Логин и пароль пусты",
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-            )
-            snackbar.open()
+            self.dislog = MDDialog(title="Логин и пароль пустые!!!",
+                     buttons=[
+                        MDRaisedButton(text="OK", on_release=self.close_pop_pup),
+                     ],
+                     auto_dismiss=False,)
+            self.dislog.open()
+
         else:
             sm.current = "loginview"
             sm.transition.direction = 'right'
-            snackbar = Snackbar(
-                text="Неправильно введен логин или пароль",
-                snackbar_x="10dp",
-                snackbar_y="10dp",
-            )
-            snackbar.open()
+            self.dislog = MDDialog(title="Неправильно введен логин или пароль",
+                                   buttons=[
+                                       MDRaisedButton(text="OK", on_release=self.close_pop_pup),
+                                   ],
+                                   auto_dismiss=False, )
+            self.dislog.open()
 
     def on_tab_switch(self, instance_tabs, instance_tab, instance_tab_label, tab_text):
         '''
@@ -100,9 +108,13 @@ class InvNaetApp(MDApp):
                 res = cur.fetchone()
 
                 if res[2][:2] != filter.text[:2]:
-                    MDDialog(title="Найдено имущество находитя не в этом кабинете!!!",
-                             text=f"Имущество {res[0]} с инвентарным номером {res[1]} находится не в этом кабинете. \n"
-                                  f"Он должен находится в кабиете {res[2]}. Имущество помещено в конец списка.").open()
+                    self.dislog = MDDialog(title="Найдено имущество находитя не в этом кабинете!!!",
+                                           text=f"Имущество {res[0]} с инвентарным номером {res[1]} находится не в этом кабинете. \n"
+                                                f"Он должен находится в кабиете {res[2]}. Имущество помещено в конец списка.",
+                                           buttons=[MDRaisedButton(text="OK", on_release=self.close_pop_pup)],
+                                           auto_dismiss=False,
+                                           )
+                    self.dislog.open()
                     item = TwoLineListItem(text=res[0],
                                            secondary_text=f'№ ИНВ: {res[1]};    Кабинет: {res[2]}',
                                            bg_color="#f7ff0d",
@@ -148,9 +160,13 @@ class InvNaetApp(MDApp):
 
                 # Проверка, есть ли найденно имущестов в списке (совпадение с фильтром), если нет добавляется как желтая пометка
                 if res[2][:2] != filter.text[:2]:
-                    MDDialog(title="Найдено имущество находится не в этом кабинете",
-                             text=f"Имущество {res[0]} с инвентарным номером {res[1]} находится не в этом кабинете. \n"
-                                  f"Он должен находится в кабиете {res[2]}").open()
+                    self.dislog = MDDialog(title="Найдено имущество находитя не в этом кабинете!!!",
+                                           text=f"Имущество {res[0]} с инвентарным номером {res[1]} находится не в этом кабинете. \n"
+                                                f"Он должен находится в кабиете {res[2]}. Имущество помещено в конец списка.",
+                                           buttons=[MDRaisedButton(text="OK", on_release=self.close_pop_pup)],
+                                           auto_dismiss=False,
+                                           )
+                    self.dislog.open()
                     item = TwoLineListItem(text=res[0],
                                            secondary_text=f'№ ИНВ: {res[1]};    Кабинет: {res[2]}',
                                            bg_color="#f7ff0d",
